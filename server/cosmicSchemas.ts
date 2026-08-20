@@ -65,6 +65,13 @@ export const safeReportFileName = (value: string) => {
   return normalized || "cosmic-report.txt";
 };
 
+export const cosmicPrivateStoragePrefix = (userId: number) => `cosmic-private/${userId}/`;
+
+export const isMemberPrivateStorageKey = (storageKey: string, userId: number) =>
+  storageKey.startsWith(cosmicPrivateStoragePrefix(userId));
+
+export const isPrivateCosmicStorageKey = (storageKey: string) => storageKey.startsWith("cosmic-private/");
+
 export type CosmicProfileInput = z.infer<typeof cosmicProfileInput>;
 export type CosmicBriefInput = z.infer<typeof cosmicBriefInput>;
 export type CosmicFileMetadataInput = z.infer<typeof cosmicFileMetadataInput>;

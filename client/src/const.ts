@@ -22,7 +22,8 @@ export const startLogin = () => {
   // available on that callback while avoiding browsers that reject a third-party
   // SameSite=None cookie before the user leaves the Cosmic origin.
   document.cookie = `${OAUTH_STATE_COOKIE}=${nonce}; Path=/; Max-Age=600; SameSite=Lax; Secure`;
-  const state = encodeOAuthState({ redirectUri, nonce });
+  const returnPath = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  const state = encodeOAuthState({ redirectUri, nonce, returnPath });
 
   const url = new URL(`${oauthPortalUrl}/app-auth`);
   url.searchParams.set("appId", appId);

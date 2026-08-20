@@ -1,6 +1,6 @@
 import { trpc } from "@/lib/trpc";
 import { COOKIE_NAME, UNAUTHED_ERR_MSG } from '@shared/const';
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 import { httpBatchLink, TRPCClientError } from "@trpc/client";
 import { createRoot } from "react-dom/client";
 import superjson from "superjson";
@@ -9,15 +9,20 @@ import { startLogin } from "./const";
 import "./index.css";
 
 const queryClient = new QueryClient();
+let loginRedirectInFlight = false;
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;
   if (typeof window === "undefined") return;
 
-  const isUnauthorized = error.message === UNAUTHED_ERR_MSG;
+  const isUnauthorized = error.data?.code === "UNAUTHORIZED" || error.message === UNAUTHED_ERR_MSG;
 
-  if (!isUnauthorized) return;
+  if (!isUnauthorized || loginRedirectInFlight) return;
 
+  loginRedirectInFlight = true;
+  window.setTimeout(() => {
+    loginRedirectInFlight = false;
+  }, 10_000);
   startLogin();
 };
 
@@ -74,8 +79,6 @@ const trpcClient = trpc.createClient({
 
 createRoot(document.getElementById("root")!).render(
   <trpc.Provider client={trpcClient} queryClient={queryClient}>
-    <QueryClientProvider client={queryClient}>
-      <App />
-    </QueryClientProvider>
+    <App />
   </trpc.Provider>
 );

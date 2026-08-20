@@ -2,7 +2,7 @@
  * Database helpers for Cosmic keep all queries member-scoped. Private birth data
  * and stored-file references are never queried without the authenticated owner ID.
  */
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   cosmicDailyBriefs,
@@ -174,6 +174,26 @@ export async function createCosmicFileRecord(userId: number, input: CosmicFileMe
 export async function listCosmicFiles(userId: number) {
   const db = await requireDb();
   return db.select().from(cosmicFiles).where(eq(cosmicFiles.userId, userId)).orderBy(desc(cosmicFiles.createdAt));
+}
+
+export async function getCosmicFileByUserIdAndStorageKey(userId: number, storageKey: string) {
+  const db = await requireDb();
+  const result = await db
+    .select()
+    .from(cosmicFiles)
+    .where(and(eq(cosmicFiles.userId, userId), eq(cosmicFiles.storageKey, storageKey)))
+    .limit(1);
+  return result[0] ?? null;
+}
+
+export async function getCosmicFileByUserIdAndId(userId: number, fileId: number) {
+  const db = await requireDb();
+  const result = await db
+    .select()
+    .from(cosmicFiles)
+    .where(and(eq(cosmicFiles.userId, userId), eq(cosmicFiles.id, fileId)))
+    .limit(1);
+  return result[0] ?? null;
 }
 
 export async function saveCosmicReading(userId: number, input: CosmicReadingInput): Promise<CosmicReading> {

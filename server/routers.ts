@@ -10,12 +10,15 @@ import {
   cosmicFileMetadataInput,
   cosmicProfileAssetUploadInput,
   cosmicProfileInput,
+  cosmicPrivateStoragePrefix,
   cosmicReadingInput,
   cosmicTextReportInput,
+  isMemberPrivateStorageKey,
   safeReportFileName,
 } from "./cosmicSchemas";
 import {
   createCosmicFileRecord,
+  getCosmicFileByUserIdAndId,
   getCosmicProfileByUserId,
   listCosmicDailyBriefs,
   listCosmicFiles,
@@ -27,7 +30,7 @@ import {
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { storagePut } from "./storage";
+import { storageGetSignedUrl, storagePut } from "./storage";
 
 export const appRouter = router({
   system: systemRouter,
@@ -45,11 +48,15 @@ export const appRouter = router({
     listDailyBriefs: protectedProcedure.query(({ ctx }) => listCosmicDailyBriefs(ctx.user.id)),
     saveDailyBrief: protectedProcedure.input(cosmicBriefInput).mutation(({ ctx, input }) => saveCosmicDailyBrief(ctx.user.id, input)),
     listFiles: protectedProcedure.query(({ ctx }) => listCosmicFiles(ctx.user.id)),
+    getFileDownloadUrl: protectedProcedure.input(z.object({ fileId: z.number().int().positive() })).mutation(async ({ ctx, input }) => {
+      const file = await getCosmicFileByUserIdAndId(ctx.user.id, input.fileId);
+      if (!file) throw new Error("That private file is not available to this member.");
+      return { url: await storageGetSignedUrl(file.storageKey), originalFilename: file.originalFilename };
+    }),
     listReadings: protectedProcedure.query(({ ctx }) => listCosmicReadings(ctx.user.id)),
     saveReading: protectedProcedure.input(cosmicReadingInput).mutation(({ ctx, input }) => saveCosmicReading(ctx.user.id, input)),
     registerStoredFile: protectedProcedure.input(cosmicFileMetadataInput).mutation(({ ctx, input }) => {
-      const memberPrefix = `cosmic/${ctx.user.id}/`;
-      if (!input.storageKey.startsWith(memberPrefix)) throw new Error("Files can only be registered inside your Cosmic storage space.");
+      if (!isMemberPrivateStorageKey(input.storageKey, ctx.user.id)) throw new Error("Files can only be registered inside your private Cosmic storage space.");
       return createCosmicFileRecord(ctx.user.id, input);
     }),
     uploadTextReport: protectedProcedure.input(cosmicTextReportInput).mutation(async ({ ctx, input }) => {
@@ -58,7 +65,7 @@ export const appRouter = router({
 
       const fileName = safeReportFileName(input.fileName.endsWith(".txt") ? input.fileName : `${input.fileName}.txt`);
       const payload = Buffer.from(input.content, "utf8");
-      const stored = await storagePut(`cosmic/${ctx.user.id}/reports/${Date.now()}-${fileName}`, payload, "text/plain; charset=utf-8");
+      const stored = await storagePut(`${cosmicPrivateStoragePrefix(ctx.user.id)}reports/${Date.now()}-${fileName}`, payload, "text/plain; charset=utf-8");
 
       return createCosmicFileRecord(ctx.user.id, {
         profileId: input.profileId ?? null,
@@ -82,7 +89,7 @@ export const appRouter = router({
       }
 
       const fileName = safeReportFileName(input.fileName);
-      const stored = await storagePut(`cosmic/${ctx.user.id}/profile-assets/${Date.now()}-${fileName}`, bytes, input.mimeType);
+      const stored = await storagePut(`${cosmicPrivateStoragePrefix(ctx.user.id)}profile-assets/${Date.now()}-${fileName}`, bytes, input.mimeType);
 
       return createCosmicFileRecord(ctx.user.id, {
         profileId: profile.id,

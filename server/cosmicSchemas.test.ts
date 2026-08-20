@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cosmicProfileInput, cosmicReadingInput, safeReportFileName } from "./cosmicSchemas";
+import { cosmicPrivateStoragePrefix, cosmicProfileInput, cosmicReadingInput, isMemberPrivateStorageKey, safeReportFileName } from "./cosmicSchemas";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
 
@@ -45,21 +45,28 @@ describe("Cosmic persistence contracts", () => {
   it("blocks anonymous profile access before any private data is queried", async () => {
     const caller = appRouter.createCaller(createContext(null));
     await expect(caller.cosmic.getMyProfile()).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+    await expect(caller.cosmic.getFileDownloadUrl({ fileId: 1 })).rejects.toMatchObject({ code: "UNAUTHORIZED" });
   });
 
-  it("rejects attempts to register a file outside the authenticated member storage prefix", async () => {
+  it("rejects attempts to register a file outside the authenticated member private storage prefix", async () => {
     const caller = appRouter.createCaller(createContext(member));
     await expect(
       caller.cosmic.registerStoredFile({
         profileId: null,
         fileKind: "attachment",
-        storageKey: "cosmic/999/attachment.txt",
-        storageUrl: "/manus-storage/cosmic/999/attachment.txt",
+      storageKey: "cosmic-private/999/attachment.txt",
+      storageUrl: "/manus-storage/cosmic-private/999/attachment.txt",
         originalFilename: "attachment.txt",
         mimeType: "text/plain",
         byteSize: 12,
       }),
-    ).rejects.toThrow("Files can only be registered inside your Cosmic storage space.");
+    ).rejects.toThrow("Files can only be registered inside your private Cosmic storage space.");
+  });
+
+  it("keeps member storage keys inside the exact authenticated prefix", () => {
+    expect(cosmicPrivateStoragePrefix(12)).toBe("cosmic-private/12/");
+    expect(isMemberPrivateStorageKey("cosmic-private/12/reports/brief.txt", 12)).toBe(true);
+    expect(isMemberPrivateStorageKey("cosmic-private/123/reports/brief.txt", 12)).toBe(false);
   });
 
   it("requires explicit camera-guidance consent before a Tarot or Palmistry reading can be saved", () => {

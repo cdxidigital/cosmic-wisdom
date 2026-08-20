@@ -1,124 +1,135 @@
 /**
- * Eclipse Almanac visual system: high-fashion editorial typography, warm paper contrast,
- * ink-plum reading fields, periwinkle signals, and carmine activation accents.
+ * Cosmic Wisdom home: a deliberately plain-language member journey.
+ * A = add the moment, B = see three useful signals, C = take one grounded action.
  */
 import { useAuth } from "@/_core/hooks/useAuth";
 import { startLogin } from "@/const";
 import { Button } from "@/components/ui/button";
+import { getPersonalJourney } from "@/lib/journey";
 import { trpc } from "@/lib/trpc";
+import { Link } from "wouter";
 import { toast } from "sonner";
 import {
+  ArrowRight,
   ArrowUpRight,
-  Asterisk,
-  ChevronDown,
+  Check,
   CircleDot,
-  Compass,
+  Clock3,
   FileText,
   FileUp,
-  Crosshair,
   Menu,
-  MoveUpRight,
-  Orbit,
-  Plus,
   Sparkles,
+  UserRound,
   X,
 } from "lucide-react";
-import { ChangeEvent, FormEvent, useState } from "react";
-import { Link } from "wouter";
+import React, { ChangeEvent, FormEvent, useMemo, useState } from "react";
 
-const navItems = ["Overview", "Today", "Systems", "Connection"];
-
-const systems = [
+const pathSteps = [
   {
-    key: "ASTRO",
-    title: "Astrology",
-    metric: "Moon in Taurus",
-    detail: "12° 08′ · 8th house",
-    copy: "A steadier emotional current is available if you let your body set the pace.",
-    mark: "☌",
+    letter: "A",
+    title: "Add your moment",
+    short: "Your birth date, time, and place give Cosmic the context it needs.",
   },
   {
-    key: "NUM",
-    title: "Numerology",
-    metric: "Personal Day 6",
-    detail: "Harmony · responsibility",
-    copy: "Invest in the arrangement that makes care feel sustainable, not performative.",
-    mark: "06",
+    letter: "B",
+    title: "See what matters",
+    short: "Three clear signals replace a page of hard-to-read symbols.",
   },
   {
-    key: "HD",
-    title: "Human Design",
-    metric: "Gate 57 activated",
-    detail: "Spleen · instinct",
-    copy: "The first quiet signal is enough. You do not need a committee to validate it.",
-    mark: "57",
+    letter: "C",
+    title: "Choose one next move",
+    short: "Every reading ends with a useful action you can take today.",
   },
 ];
 
-const signalSources = [
-  ["MOON", "Taurus", "12°08′"],
-  ["PERSONAL DAY", "6", "Harmony"],
-  ["HD TRANSIT", "57", "Instinct"],
-];
-
-function SignalTag({ children, accent = false }: { children: string; accent?: boolean }) {
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 border px-2.5 py-1 font-mono text-[9px] font-semibold leading-none tracking-[0.18em] ${
-        accent
-          ? "border-[#EF5D3F]/35 bg-[#EF5D3F]/10 text-[#EF5D3F]"
-          : "border-[#1a2d3d]/15 bg-white/50 text-[#183448]"
-      }`}
-    >
-      <span className={`h-1.5 w-1.5 rounded-full ${accent ? "bg-[#EF5D3F]" : "bg-[#80a7bd]"}`} />
-      {children}
-    </span>
-  );
+function PathLabel({ children, accent = false }: { children: string; accent?: boolean }) {
+  return <span className={`inline-flex items-center gap-2 border px-3 py-1.5 font-mono text-[9px] font-semibold tracking-[.14em] ${accent ? "border-[#EF5D3F]/40 bg-[#EF5D3F]/10 text-[#EF5D3F]" : "border-[#102936]/15 bg-white/45 text-[#55707d]"}`}><span className={`h-1.5 w-1.5 rounded-full ${accent ? "bg-[#EF5D3F]" : "bg-[#89a9b9]"}`} />{children}</span>;
 }
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [activeSystem, setActiveSystem] = useState("ASTRO");
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const { isAuthenticated } = useAuth();
   const utils = trpc.useUtils();
   const myProfile = trpc.cosmic.getMyProfile.useQuery(undefined, { enabled: isAuthenticated });
-  const saveProfile = trpc.cosmic.saveProfile.useMutation({
-    onSuccess: profile => {
-      utils.cosmic.getMyProfile.setData(undefined, profile);
-      setProfileOpen(false);
-      toast("Your field has been saved", { description: "Your private Cosmic profile is now stored securely and ready for calculation." });
+  const files = trpc.cosmic.listFiles.useQuery(undefined, { enabled: isAuthenticated && profileOpen });
+  const profile = myProfile.data;
+  const { hasProfile, isCalculated, firstName } = getPersonalJourney(profile);
+  const storedFileCount = files.data?.length ?? 0;
+  const latestFile = files.data?.[0] ?? null;
+
+  const coreSignals = useMemo(() => [
+    {
+      number: "01",
+      title: "Your rhythm",
+      simple: isCalculated ? "Your calculated timing signal is ready." : hasProfile ? "Your timing signal is queued for calculation." : "Add your details to reveal your natural pace.",
+      source: "Birth date + current timing",
     },
-    onError: error => toast("We couldn’t save your field", { description: error.message }),
-  });
-  const uploadProfileAsset = trpc.cosmic.uploadProfileAsset.useMutation({
-    onSuccess: () => {
-      utils.cosmic.listFiles.invalidate();
-      toast("Profile asset attached", { description: "Your file is stored securely with your private Cosmic profile." });
+    {
+      number: "02",
+      title: "Your decision style",
+      simple: isCalculated ? "Your decision-making cue is ready to use." : hasProfile ? "Your decision cue will appear with your first calculation." : "Learn the easiest way for you to make clear choices.",
+      source: "Birth time + personal pattern",
     },
-    onError: error => toast("We couldn’t attach that file", { description: error.message }),
-  });
-  const savePatternBriefReport = trpc.cosmic.uploadTextReport.useMutation({
-    onSuccess: () => {
-      utils.cosmic.listFiles.invalidate();
-      toast("Pattern Brief saved", { description: "A private text report is now available in your Cosmic file history." });
+    {
+      number: "03",
+      title: "Your focus today",
+      simple: isCalculated ? "Your current focus signal is ready." : hasProfile ? "Your daily focus will appear as soon as the calculation layer is connected." : "Turn a complex chart into one simple focus for today.",
+      source: "Today’s cycle + active transits",
     },
-    onError: error => toast("We couldn’t save your Pattern Brief", { description: error.message }),
-  });
+  ], [hasProfile, isCalculated]);
+
+  const openProfile = () => {
+    setMenuOpen(false);
+    setProfileOpen(true);
+  };
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
     setMenuOpen(false);
   };
 
+  const saveProfile = trpc.cosmic.saveProfile.useMutation({
+    onSuccess: savedProfile => {
+      utils.cosmic.getMyProfile.setData(undefined, savedProfile);
+      utils.cosmic.listFiles.invalidate();
+      setProfileOpen(false);
+      toast("Your personal field is ready", { description: "Cosmic has stored your details privately. Your signal cards are ready for calculation." });
+    },
+    onError: error => toast("We couldn’t save your details", { description: error.message }),
+  });
+
+  const uploadProfileAsset = trpc.cosmic.uploadProfileAsset.useMutation({
+    onSuccess: () => {
+      utils.cosmic.listFiles.invalidate();
+      toast("Private file added", { description: "Your attachment is stored in your protected Cosmic file space." });
+    },
+    onError: error => toast("We couldn’t attach that file", { description: error.message }),
+  });
+
+  const savePatternBriefReport = trpc.cosmic.uploadTextReport.useMutation({
+    onSuccess: () => {
+      utils.cosmic.listFiles.invalidate();
+      toast("Reading saved privately", { description: "A text copy of this simple daily prompt is now in your protected file space." });
+    },
+    onError: error => toast("We couldn’t save that reading", { description: error.message }),
+  });
+  const openPrivateFile = trpc.cosmic.getFileDownloadUrl.useMutation({
+    onSuccess: ({ url, originalFilename }) => {
+      window.open(url, "_blank", "noopener,noreferrer");
+      toast("Opening protected file", { description: `${originalFilename} is being opened through your private member session.` });
+    },
+    onError: error => toast("We couldn’t open that private file", { description: error.message }),
+  });
+
   const handleProfileSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!isAuthenticated) {
-      toast("Sign in to save your field", { description: "Cosmic protects your birth details inside your private member account." });
+      toast("Sign in to keep your personal field", { description: "Your birth details are only saved inside your private member account." });
       startLogin();
       return;
     }
-
     const formData = new FormData(event.currentTarget);
     saveProfile.mutate({
       displayName: String(formData.get("fullName") ?? ""),
@@ -134,261 +145,106 @@ export default function Home() {
     event.target.value = "";
     if (!file) return;
     if (!isAuthenticated) {
-      toast("Sign in to attach a file", { description: "Cosmic keeps profile assets inside your private member account." });
+      toast("Sign in to attach a file", { description: "Cosmic keeps supporting files inside your private member account." });
       startLogin();
       return;
     }
-    const profile = myProfile.data;
     if (!profile) {
-      toast("Save your field first", { description: "Once your birth profile is saved, you can attach a chart scan, report, or supporting file." });
+      toast("Save step A first", { description: "Once your personal field is saved, you can attach a chart scan or supporting file." });
       return;
     }
     if (file.size > 7_500_000) {
-      toast("That file is too large", { description: "Choose an image or PDF below 7.5 MB." });
+      toast("That file is too large", { description: "Choose a PNG, JPG, WEBP, or PDF below 7.5 MB." });
       return;
     }
-
     const reader = new FileReader();
     reader.onload = () => {
-      const result = typeof reader.result === "string" ? reader.result.split(",")[1] : null;
-      if (!result) {
-        toast("We couldn’t read that file", { description: "Please try a PNG, JPG, WEBP, or PDF file." });
+      const contentBase64 = typeof reader.result === "string" ? reader.result.split(",")[1] : null;
+      if (!contentBase64) {
+        toast("We couldn’t read that file", { description: "Please try a different PNG, JPG, WEBP, or PDF." });
         return;
       }
       uploadProfileAsset.mutate({
         profileId: profile.id,
         fileName: file.name,
         mimeType: file.type as "image/jpeg" | "image/png" | "image/webp" | "application/pdf",
-        contentBase64: result,
+        contentBase64,
       });
     };
     reader.onerror = () => toast("We couldn’t read that file", { description: "Please choose a different file and try again." });
     reader.readAsDataURL(file);
   };
 
-  const handlePatternBriefReport = () => {
+  const handleSaveDailyPrompt = () => {
     if (!isAuthenticated) {
-      toast("Sign in to save your Pattern Brief", { description: "Cosmic stores reading exports inside your private member account." });
+      toast("Sign in to save your reading", { description: "Your saved prompts live inside your private member account." });
       startLogin();
       return;
     }
-    const profile = myProfile.data;
     if (!profile) {
-      toast("Save your field first", { description: "Once your birth profile is saved, you can keep a dated copy of this reading." });
+      toast("Complete step A first", { description: "Save your personal field before keeping a dated reading." });
+      openProfile();
       return;
     }
-    const today = new Date().toISOString().slice(0, 10);
+    const date = new Date().toISOString().slice(0, 10);
     const report = [
-      "COSMIC WISDOM / PATTERN BRIEF",
+      "COSMIC WISDOM / SIMPLE DAILY READING",
       `Profile: ${profile.displayName}`,
-      `Date: ${today}`,
+      `Date: ${date}`,
       "",
-      "The work is to make one clean decision — and let that decision restore your bandwidth.",
+      "TODAY’S ONE USEFUL MOVE",
+      "Choose one task that makes tomorrow easier, and complete the smallest useful version of it before taking on anything new.",
       "",
-      "SOURCE SIGNALS",
-      "Astrology: Moon in Taurus · 12°08′ · 8th house",
-      "Numerology: Personal Day 6 · Harmony · responsibility",
-      "Human Design: Gate 57 activated · Spleen · instinct",
+      "SOURCE STATUS",
+      isCalculated ? "Your calculated signal layer is connected." : "Your field is stored. Detailed calculations will appear here when the calculation layer is connected.",
     ].join("\n");
-    savePatternBriefReport.mutate({
-      profileId: profile.id,
-      fileName: `cosmic-wisdom-pattern-brief-${today}.txt`,
-      content: report,
-    });
+    savePatternBriefReport.mutate({ profileId: profile.id, fileName: `cosmic-wisdom-daily-reading-${date}.txt`, content: report });
   };
 
-  return (
-    <main className="min-h-screen overflow-hidden bg-[#F3F0E9] text-[#102936] selection:bg-[#EF5D3F] selection:text-white">
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[76px] flex-col items-center border-r border-white/10 bg-[#071722] py-7 text-[#F3F0E9] lg:flex">
-        <button
-          className="group relative flex h-11 w-11 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EF5D3F]"
-          aria-label="Return to Cosmic overview"
-          onClick={() => scrollTo("overview")}
-        >
-          <img src="/manus-storage/cosmic-orbit-mark_02e07e29.png" alt="" className="h-11 w-11 scale-[1.42] object-cover transition-transform duration-200 group-hover:rotate-12" />
-        </button>
-        <div className="mt-10 flex flex-1 flex-col items-center gap-6">
-          {navItems.map((item, index) => (
-            <button
-              key={item}
-              onClick={() => scrollTo(["overview", "today", "systems", "connection"][index])}
-              className="group relative flex h-8 w-8 items-center justify-center text-[9px] font-bold tracking-[0.12em] text-[#8fa7b5] transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#EF5D3F]"
-              aria-label={item}
-            >
-              <span className="absolute left-8 hidden whitespace-nowrap bg-[#071722] px-2 py-1.5 font-mono text-[9px] tracking-[0.12em] text-white group-hover:block">{item}</span>
-              0{index + 1}
-            </button>
-          ))}
-        </div>
-        <button
-          onClick={() => setProfileOpen(true)}
-          aria-label="Create your profile"
-          className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 text-[#F3F0E9] transition-all duration-200 hover:border-[#EF5D3F] hover:bg-[#EF5D3F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EF5D3F]"
-        >
-          <Plus size={16} />
-        </button>
-      </aside>
+  const handleOpenLatestFile = () => {
+    if (!latestFile) return;
+    openPrivateFile.mutate({ fileId: latestFile.id });
+  };
 
-      <header className="relative z-30 mx-auto flex max-w-[1500px] items-center justify-between px-5 py-5 md:px-9 lg:ml-[76px] lg:max-w-none lg:px-12">
-        <button onClick={() => scrollTo("overview")} className="flex items-center gap-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EF5D3F] lg:hidden">
-          <img src="/manus-storage/cosmic-orbit-mark_02e07e29.png" alt="Cosmic" className="h-9 w-9 scale-[1.42] object-cover" />
-          <span className="font-sans text-xs font-extrabold tracking-[0.28em] text-[#102936]">COSMIC</span>
+  return <main className="min-h-screen overflow-hidden bg-[#F3F0E9] text-[#102936] selection:bg-[#EF5D3F] selection:text-white">
+    <header className="sticky top-0 z-40 border-b border-[#102936]/10 bg-[#F3F0E9]/92 backdrop-blur">
+      <div className="mx-auto flex max-w-[1500px] items-center justify-between gap-5 px-5 py-4 md:px-9 lg:px-12">
+        <button onClick={() => scrollTo("overview")} className="group flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EF5D3F]">
+          <span className="relative h-9 w-9 overflow-hidden"><img src="/manus-storage/cosmic-orbit-mark_02e07e29.png" alt="" className="h-9 w-9 scale-[1.42] object-cover transition-transform group-hover:rotate-12" /></span>
+          <span className="font-sans text-[10px] font-extrabold tracking-[.3em] text-[#102936]">COSMIC <span className="font-mono text-[8px] font-medium tracking-[.16em] text-[#EF5D3F]">WISDOM</span></span>
         </button>
-        <div className="hidden items-center gap-9 lg:flex">
-          <span className="font-sans text-[11px] font-extrabold tracking-[0.34em] text-[#102936]">COSMIC / INDEX</span>
-          <span className="h-3.5 w-px bg-[#102936]/20" />
-          <span className="font-mono text-[10px] tracking-[0.12em] text-[#55707d]">DAILY SELF-PATTERN ENGINE</span>
-        </div>
         <nav className="hidden items-center gap-7 md:flex" aria-label="Main navigation">
-          {navItems.map((item, index) => (
-            <button key={item} onClick={() => scrollTo(["overview", "today", "systems", "connection"][index])} className="font-sans text-[10px] font-semibold uppercase tracking-[0.16em] text-[#36515d] transition-colors hover:text-[#EF5D3F] focus-visible:outline-none focus-visible:text-[#EF5D3F]">
-              {item}
-            </button>
-          ))}
-          <Button onClick={() => setProfileOpen(true)} className="h-10 rounded-none bg-[#102936] px-5 font-sans text-[10px] font-bold tracking-[0.12em] text-white hover:bg-[#EF5D3F]">
-            CREATE FIELD <ArrowUpRight className="ml-1.5 h-3.5 w-3.5" />
-          </Button>
+          <button onClick={() => scrollTo("your-path")} className="font-mono text-[9px] tracking-[.14em] text-[#55707d] transition-colors hover:text-[#EF5D3F]">HOW IT WORKS</button>
+          <button onClick={() => scrollTo("your-signals")} className="font-mono text-[9px] tracking-[.14em] text-[#55707d] transition-colors hover:text-[#EF5D3F]">YOUR SIGNALS</button>
+          <Link href="/tarot" className="font-mono text-[9px] tracking-[.14em] text-[#55707d] transition-colors hover:text-[#EF5D3F]">TAROT</Link>
+          <Link href="/palmistry" className="font-mono text-[9px] tracking-[.14em] text-[#55707d] transition-colors hover:text-[#EF5D3F]">PALMISTRY</Link>
+          <Button onClick={openProfile} className="h-10 rounded-none bg-[#102936] px-5 font-mono text-[9px] tracking-[.14em] text-white hover:bg-[#EF5D3F]">{hasProfile ? "UPDATE MY DETAILS" : "START WITH A"}<ArrowUpRight className="ml-2 h-3.5 w-3.5" /></Button>
         </nav>
-        <button onClick={() => setMenuOpen(!menuOpen)} aria-label="Open menu" className="flex h-10 w-10 items-center justify-center border border-[#102936]/20 text-[#102936] md:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EF5D3F]">
-          {menuOpen ? <X size={18} /> : <Menu size={18} />}
-        </button>
-        {menuOpen && (
-          <div className="absolute left-5 right-5 top-[72px] border border-[#102936]/10 bg-[#F3F0E9] p-4 shadow-[0_20px_50px_rgba(7,23,34,0.16)] md:hidden">
-            {navItems.map((item, index) => (
-              <button key={item} onClick={() => scrollTo(["overview", "today", "systems", "connection"][index])} className="flex w-full items-center justify-between border-b border-[#102936]/10 px-1 py-3 text-left font-sans text-xs font-bold tracking-[0.08em] text-[#102936] last:border-0">
-                {item} <ArrowUpRight size={14} />
-              </button>
-            ))}
-            <Button onClick={() => setProfileOpen(true)} className="mt-3 w-full rounded-none bg-[#102936] font-sans text-[10px] tracking-[0.14em] text-white">CREATE FIELD</Button>
-          </div>
-        )}
-      </header>
+        <button onClick={() => setMenuOpen(open => !open)} aria-label="Open menu" aria-expanded={menuOpen} className="flex h-10 w-10 items-center justify-center border border-[#102936]/15 text-[#102936] md:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EF5D3F]">{menuOpen ? <X size={18} /> : <Menu size={18} />}</button>
+      </div>
+      {menuOpen && <div className="border-t border-[#102936]/10 bg-[#F3F0E9] px-5 py-3 md:hidden"><div className="mx-auto max-w-[1500px] space-y-1"><button onClick={() => scrollTo("your-path")} className="flex w-full justify-between border-b border-[#102936]/10 py-3 font-mono text-[10px] tracking-[.14em]">HOW IT WORKS <ArrowRight size={14} /></button><button onClick={() => scrollTo("your-signals")} className="flex w-full justify-between border-b border-[#102936]/10 py-3 font-mono text-[10px] tracking-[.14em]">YOUR SIGNALS <ArrowRight size={14} /></button><Link href="/tarot" className="flex justify-between border-b border-[#102936]/10 py-3 font-mono text-[10px] tracking-[.14em]">TAROT <ArrowRight size={14} /></Link><Link href="/palmistry" className="flex justify-between py-3 font-mono text-[10px] tracking-[.14em]">PALMISTRY <ArrowRight size={14} /></Link><Button onClick={openProfile} className="mt-3 w-full rounded-none bg-[#102936] font-mono text-[9px] tracking-[.14em] text-white">{hasProfile ? "UPDATE MY DETAILS" : "START WITH A"}</Button></div></div>}
+    </header>
 
-      <section id="overview" className="relative px-5 pb-20 pt-5 md:px-9 lg:ml-[76px] lg:px-12 lg:pb-28 lg:pt-8">
-        <div className="relative mx-auto max-w-[1500px] overflow-hidden bg-[#071722] shadow-[0_26px_80px_rgba(7,23,34,0.2)]">
-          <img src="/manus-storage/cosmic-hero-field_09e49a6f.png" alt="Abstract orbital field in a midnight observatory palette" className="absolute inset-0 h-full w-full object-cover opacity-80" />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(33,27,42,0.98)_2%,rgba(33,27,42,0.86)_43%,rgba(33,27,42,0.28)_78%,rgba(33,27,42,0.2)_100%)]" />
-          <div className="absolute left-0 top-0 h-full w-1 bg-[#EF5D3F]" />
-          <div className="relative grid min-h-[620px] gap-8 px-6 py-8 sm:px-10 md:px-14 md:py-12 lg:grid-cols-[minmax(0,1.28fr)_minmax(340px,.72fr)] lg:px-16 lg:py-16">
-            <div className="flex flex-col justify-between">
-              <div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <SignalTag accent>TODAY / 20 AUG</SignalTag>
-                  <span className="font-mono text-[10px] tracking-[0.12em] text-[#9db3c0]">THURSDAY · PERSONAL DAY 6</span>
-                </div>
-                <h1 className="mt-10 max-w-[720px] font-serif text-[clamp(3.8rem,8vw,8.5rem)] leading-[0.84] tracking-[-0.068em] text-[#F3F0E9]">
-                  Your inner weather,<br />
-                  <em className="font-light text-[#9bc2d5]">in focus.</em>
-                </h1>
-                <p className="mt-8 max-w-[490px] font-sans text-[15px] font-medium leading-[1.75] text-[#c5d3d8] md:text-[17px]">
-                  One daily lens for the three systems that shape your rhythm: astrology, numerology, and Human Design.
-                </p>
-                <div className="mt-9 flex flex-wrap gap-3">
-                  <Button onClick={() => scrollTo("today")} className="h-12 rounded-none bg-[#EF5D3F] px-6 font-sans text-[10px] font-bold tracking-[0.14em] text-white hover:bg-[#ff7658]">
-                    READ TODAY’S BRIEF <MoveUpRight className="ml-2 h-4 w-4" />
-                  </Button>
-                  <Button onClick={() => setProfileOpen(true)} variant="outline" className="h-12 rounded-none border-white/25 bg-transparent px-6 font-sans text-[10px] font-bold tracking-[0.14em] text-white hover:border-white hover:bg-white/10 hover:text-white">
-                    BUILD YOUR FIELD
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-14 flex flex-wrap items-end justify-between gap-6 border-t border-white/15 pt-5">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#EF5D3F]/60 text-[#EF5D3F]"><CircleDot size={14} /></div>
-                  <div><p className="font-mono text-[9px] tracking-[0.14em] text-[#9db3c0]">SYSTEM STATUS</p><p className="mt-0.5 font-sans text-xs font-semibold text-white">3 signals aligned</p></div>
-                </div>
-                <span className="font-mono text-[9px] tracking-[0.13em] text-[#9db3c0]">UTC +08:00 · PERTH</span>
-              </div>
-            </div>
+    <section id="overview" className="px-5 py-7 md:px-9 md:py-10 lg:px-12 lg:py-14">
+      <div className="relative mx-auto max-w-[1500px] overflow-hidden bg-[#211B2A] px-6 py-8 text-[#F3F0E9] shadow-[0_26px_80px_rgba(33,27,42,.2)] sm:px-10 sm:py-12 md:px-14 lg:grid lg:grid-cols-[1.08fr_.92fr] lg:gap-12 lg:px-16 lg:py-16">
+        <img src="/manus-storage/cosmic-hero-field_09e49a6f.png" alt="" className="absolute inset-0 h-full w-full object-cover opacity-30 mix-blend-screen" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(33,27,42,.98),rgba(33,27,42,.91)_52%,rgba(33,27,42,.56))]" />
+        <div className="absolute inset-y-0 left-0 w-1 bg-[#EF5D3F]" />
+        <div className="relative"><PathLabel accent>PERSONAL GUIDANCE, MADE SIMPLE</PathLabel><h1 className="mt-7 max-w-[760px] font-serif text-[clamp(3.8rem,8vw,7.8rem)] leading-[.84] tracking-[-.065em]">Your chart,<br /><em className="font-light text-[#D9D1EF]">made useful.</em></h1><p className="mt-7 max-w-[560px] font-sans text-[16px] leading-7 text-[#E3DAEA] md:text-[18px]">Cosmic turns complex systems into three things you can use: your rhythm, your decision style, and one practical focus for today.</p><div className="mt-9 flex flex-wrap gap-3"><Button onClick={() => hasProfile ? scrollTo("your-signals") : openProfile()} className="h-12 rounded-none bg-[#EF5D3F] px-6 font-mono text-[10px] tracking-[.14em] text-white hover:bg-[#D75D7F]">{hasProfile ? "GO TO STEP B" : "START WITH STEP A"}<ArrowRight className="ml-2" size={15} /></Button><button onClick={() => scrollTo("your-path")} className="px-4 font-mono text-[10px] tracking-[.14em] text-[#D9D1EF] hover:text-white">SEE THE 3 STEPS</button></div></div>
+        <aside className="relative mt-10 border border-white/15 bg-[#F3F0E9]/95 p-5 text-[#102936] shadow-[-12px_14px_0_rgba(239,93,63,.82)] lg:mt-0 lg:self-end sm:p-7"><div className="flex items-start justify-between gap-6"><div><p className="font-mono text-[9px] font-semibold tracking-[.15em] text-[#EF5D3F]">YOUR CURRENT PLACE</p><h2 className="mt-3 font-serif text-3xl leading-[.95] tracking-[-.05em]">{hasProfile ? `Welcome back, ${firstName}.` : "Begin with your details."}</h2></div><UserRound size={23} className="text-[#EF5D3F]" /></div><div className="mt-7 space-y-4">{pathSteps.map((step, index) => { const done = index === 0 && hasProfile; const current = (index === 0 && !hasProfile) || (index === 1 && hasProfile); return <div key={step.letter} className="flex items-center gap-3"><span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border font-mono text-[10px] font-semibold ${done ? "border-[#EF5D3F] bg-[#EF5D3F] text-white" : current ? "border-[#102936] bg-[#102936] text-white" : "border-[#102936]/20 text-[#55707d]"}`}>{done ? <Check size={14} /> : step.letter}</span><div><p className="font-sans text-[13px] font-bold">{step.title}</p><p className="mt-0.5 font-sans text-[11px] text-[#55707d]">{done ? "Complete" : current ? "Your next step" : "Unlocked next"}</p></div></div>; })}</div><button onClick={openProfile} className="mt-7 flex items-center gap-2 font-mono text-[9px] font-semibold tracking-[.14em] text-[#EF5D3F] hover:text-[#B63C5E]">{hasProfile ? "REVIEW YOUR DETAILS" : "ADD YOUR DETAILS"}<ArrowUpRight size={14} /></button></aside>
+      </div>
+    </section>
 
-            <article className="self-end border border-white/15 bg-[#f3f0e9]/95 p-5 text-[#102936] shadow-[-14px_16px_0_rgba(239,93,63,0.88)] sm:p-7">
-              <div className="flex items-start justify-between gap-3">
-                <div><p className="font-mono text-[9px] font-semibold tracking-[0.16em] text-[#EF5D3F]">01 / PATTERN BRIEF</p><p className="mt-2 font-sans text-xs font-medium text-[#55707d]">A synthesis from your active systems</p></div>
-                <Compass size={21} strokeWidth={1.4} className="text-[#102936]" />
-              </div>
-              <div className="my-7 h-px bg-[#102936]/10" />
-              <blockquote className="font-serif text-[clamp(1.7rem,3vw,2.45rem)] leading-[1.04] tracking-[-0.04em] text-[#102936]">
-                “The work is to make <em className="text-[#EF5D3F]">one clean decision</em> — and let that decision restore your bandwidth.”
-              </blockquote>
-              <div className="mt-7 grid gap-2 border-t border-[#102936]/10 pt-4 sm:grid-cols-3">
-                {signalSources.map(([label, value, detail]) => <div key={label}><p className="font-mono text-[8px] tracking-[0.12em] text-[#6b828d]">{label}</p><p className="mt-1 font-sans text-xs font-bold">{value}</p><p className="mt-0.5 font-sans text-[10px] text-[#55707d]">{detail}</p></div>)}
-              </div>
-              <button onClick={() => scrollTo("systems")} className="mt-6 flex items-center gap-2 font-sans text-[10px] font-bold tracking-[0.13em] text-[#102936] transition-colors hover:text-[#EF5D3F] focus-visible:outline-none focus-visible:text-[#EF5D3F]">OPEN SIGNAL SOURCES <ArrowUpRight size={13} /></button>
-            </article>
-          </div>
-          <div className="absolute bottom-0 right-5 hidden items-center gap-2 pb-5 font-mono text-[8px] tracking-[0.15em] text-[#a2b6c0] lg:flex"><Asterisk size={11} /> TRANSPARENT BY DESIGN</div>
-        </div>
-      </section>
+    <section id="your-path" className="border-y border-[#102936]/10 px-5 py-16 md:px-9 lg:px-12 lg:py-24"><div className="mx-auto max-w-[1500px]"><div className="max-w-2xl"><p className="font-mono text-[10px] font-semibold tracking-[.15em] text-[#EF5D3F]">THE SIMPLE PATH</p><h2 className="mt-4 font-serif text-5xl leading-[.9] tracking-[-.06em] text-[#102936] md:text-6xl">Three steps. No chart-reading degree required.</h2><p className="mt-5 max-w-xl font-sans text-[15px] leading-7 text-[#55707d]">The system stays detailed under the surface. On the page, you only see what is useful to you right now.</p></div><div className="mt-10 grid gap-px overflow-hidden border border-[#102936]/10 bg-[#102936]/10 md:grid-cols-3">{pathSteps.map((step, index) => <article key={step.letter} className="bg-[#F8F6F1] p-6 md:p-8"><span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#211B2A] font-serif text-2xl text-[#F3F0E9]">{step.letter}</span><h3 className="mt-8 font-serif text-4xl leading-none tracking-[-.05em]">{step.title}</h3><p className="mt-4 max-w-sm font-sans text-[14px] leading-6 text-[#55707d]">{step.short}</p>{index === 0 ? <button onClick={openProfile} className="mt-7 flex items-center gap-2 font-mono text-[9px] font-semibold tracking-[.14em] text-[#EF5D3F] hover:text-[#B63C5E]">{hasProfile ? "UPDATE DETAILS" : "ADD DETAILS"}<ArrowRight size={14} /></button> : <button onClick={() => scrollTo(index === 1 ? "your-signals" : "today")} className="mt-7 flex items-center gap-2 font-mono text-[9px] font-semibold tracking-[.14em] text-[#102936] hover:text-[#EF5D3F]">{index === 1 ? "SEE THE SIGNALS" : "READ TODAY’S PROMPT"}<ArrowRight size={14} /></button>}</article>)}</div></div></section>
 
-      <section id="today" className="border-y border-[#102936]/10 px-5 py-16 md:px-9 lg:ml-[76px] lg:px-12 lg:py-24">
-        <div className="mx-auto grid max-w-[1500px] gap-12 lg:grid-cols-[0.78fr_1.22fr] lg:gap-20">
-          <div className="lg:pt-4">
-            <div className="flex items-center gap-3"><span className="h-px w-9 bg-[#EF5D3F]" /><p className="font-mono text-[10px] font-semibold tracking-[0.15em] text-[#EF5D3F]">TODAY’S FIELD</p></div>
-            <h2 className="mt-5 max-w-sm font-serif text-5xl leading-[0.89] tracking-[-0.06em] text-[#102936] md:text-6xl">The signal is more useful when you can see its source.</h2>
-            <p className="mt-8 max-w-md font-sans text-[15px] leading-[1.8] text-[#55707d]">Cosmic does not flatten your data into a generic forecast. Each brief is an inspectable synthesis of calculated placements, activated gates, and your personal number cycle.</p>
-            <button onClick={() => scrollTo("connection")} className="mt-8 flex items-center gap-2 font-sans text-[10px] font-bold tracking-[0.13em] text-[#102936] transition-colors hover:text-[#EF5D3F] focus-visible:outline-none focus-visible:text-[#EF5D3F]">HOW THE ENGINE THINKS <ArrowUpRight size={14} /></button>
-          </div>
-          <div className="relative grid gap-px overflow-hidden bg-[#102936]/15 md:grid-cols-3">
-            {systems.map((system, index) => (
-              <button key={system.key} onClick={() => setActiveSystem(system.key)} className={`group relative min-h-[320px] overflow-hidden p-6 text-left transition-colors focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EF5D3F] ${activeSystem === system.key ? "bg-[#102936] text-[#F3F0E9]" : "bg-[#F8F6F1] text-[#102936] hover:bg-[#e9eef0]"}`}>
-                <span className={`absolute right-5 top-3 font-serif text-7xl leading-none tracking-[-0.1em] transition-colors ${activeSystem === system.key ? "text-white/10" : "text-[#102936]/5"}`}>{system.mark}</span>
-                <div className="relative flex h-full flex-col justify-between">
-                  <div><div className="flex items-center justify-between"><span className={`font-mono text-[9px] font-semibold leading-none tracking-[0.18em] ${activeSystem === system.key ? "text-[#EF5D3F]" : "text-[#55707d]"}`}>0{index + 1} / {system.key}</span><span className={`h-2 w-2 rounded-full ${activeSystem === system.key ? "bg-[#EF5D3F]" : "bg-[#91b6c6]"}`} /></div><h3 className="mt-10 font-serif text-3xl leading-[0.92] tracking-[-0.055em]">{system.title}</h3><p className={`mt-4 font-sans text-[13px] font-bold ${activeSystem === system.key ? "text-white" : "text-[#102936]"}`}>{system.metric}</p><p className={`mt-1.5 font-mono text-[8px] leading-none tracking-[0.15em] ${activeSystem === system.key ? "text-[#9db3c0]" : "text-[#6b828d]"}`}>{system.detail}</p></div>
-                  <div><p className={`max-w-[240px] font-sans text-[13px] leading-[1.7] ${activeSystem === system.key ? "text-[#c5d3d8]" : "text-[#55707d]"}`}>{system.copy}</p><span className="mt-6 flex items-center gap-2 font-sans text-[9px] font-bold tracking-[0.16em]">VIEW SIGNAL <ArrowUpRight size={13} /></span></div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
+    <section id="your-signals" className="px-5 py-16 md:px-9 lg:px-12 lg:py-24"><div className="mx-auto grid max-w-[1500px] gap-10 lg:grid-cols-[.65fr_1.35fr] lg:gap-16"><div className="lg:pt-4"><PathLabel accent>STEP B / WHAT MATTERS</PathLabel><h2 className="mt-5 font-serif text-5xl leading-[.9] tracking-[-.06em] md:text-6xl">The chart translated into everyday language.</h2><p className="mt-6 max-w-md font-sans text-[15px] leading-7 text-[#55707d]">Instead of a wall of placements, Cosmic starts with three questions: How should I pace myself? How do I decide? What is worth my attention today?</p><button onClick={() => setDetailsOpen(open => !open)} aria-expanded={detailsOpen} className="mt-7 flex items-center gap-2 font-mono text-[9px] font-semibold tracking-[.14em] text-[#102936] hover:text-[#EF5D3F]">{detailsOpen ? "HIDE SOURCE DETAILS" : "SHOW SOURCE DETAILS"}<ArrowUpRight size={14} /></button>{detailsOpen && <div className="mt-4 border-l-2 border-[#EF5D3F] pl-4 font-sans text-[12px] leading-5 text-[#55707d]">Source detail remains available when you want it: astrology supplies timing, numerology supplies cycle language, and Human Design supplies decision-making cues. The first screen keeps those sources translated, not hidden.</div>}</div><div className="grid gap-3 md:grid-cols-3">{coreSignals.map((signal, index) => <article key={signal.number} className={`min-h-[315px] border p-6 ${index === 1 ? "border-[#211B2A] bg-[#211B2A] text-[#F3F0E9] shadow-[-8px_10px_0_#EF5D3F]" : "border-[#102936]/15 bg-white/55"}`}><p className={`font-mono text-[9px] font-semibold tracking-[.16em] ${index === 1 ? "text-[#E1A0B1]" : "text-[#EF5D3F]"}`}>{signal.number} / PLAIN LANGUAGE</p><h3 className="mt-10 font-serif text-3xl leading-[.95] tracking-[-.05em]">{signal.title}</h3><p className={`mt-6 font-sans text-[14px] leading-6 ${index === 1 ? "text-[#E3DAEA]" : "text-[#46616d]"}`}>{signal.simple}</p><div className={`mt-9 border-t pt-4 ${index === 1 ? "border-white/15" : "border-[#102936]/10"}`}><p className={`font-mono text-[8px] tracking-[.13em] ${index === 1 ? "text-[#BFC8E3]" : "text-[#6B828D]"}`}>SOURCE / {signal.source.toUpperCase()}</p></div></article>)}</div></div></section>
 
-      <section id="systems" className="relative px-5 py-16 md:px-9 lg:ml-[76px] lg:px-12 lg:py-24">
-        <div className="mx-auto grid max-w-[1500px] gap-10 lg:grid-cols-[1.08fr_.92fr] lg:items-stretch">
-          <div className="relative min-h-[500px] overflow-hidden bg-[#e6ecec] p-7 md:p-10">
-            <img src="/manus-storage/cosmic-bodygraph-study_817fa0dd.png" alt="Abstract technical visual inspired by interlinked personal pattern systems" className="absolute inset-0 h-full w-full object-cover mix-blend-multiply opacity-80" />
-            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(230,236,236,.96),rgba(230,236,236,.6),rgba(230,236,236,.12))]" />
-            <div className="relative flex h-full flex-col justify-between">
-              <div className="flex items-center justify-between"><SignalTag>THE PATTERN STACK</SignalTag><span className="font-mono text-[9px] tracking-[0.12em] text-[#55707d]">V1.0 / READING LAYER</span></div>
-              <div className="max-w-[490px]"><p className="font-mono text-[10px] font-semibold tracking-[0.14em] text-[#EF5D3F]">THREE LENSES. ONE DAILY PRACTICE.</p><h2 className="mt-4 font-serif text-5xl leading-[0.92] tracking-[-0.06em] text-[#102936] md:text-6xl">No siloed systems. No black-box reading.</h2><p className="mt-6 max-w-md font-sans text-base leading-7 text-[#46616d]">Move from signal to meaning without losing the mathematics, timing, or context that generated it.</p></div>
-              <div className="flex flex-wrap gap-2"><SignalTag>PLACEMENTS</SignalTag><SignalTag>GATES</SignalTag><SignalTag>CYCLES</SignalTag><SignalTag accent>ACTIVE NOW</SignalTag></div>
-            </div>
-          </div>
-          <div className="flex flex-col justify-between bg-[#071722] p-7 text-[#F3F0E9] md:p-10">
-            <div><div className="flex items-center gap-3"><Orbit size={17} className="text-[#EF5D3F]" /><p className="font-mono text-[10px] font-semibold tracking-[0.15em] text-[#EF5D3F]">YOUR PROFILE, UNFOLDED</p></div><h2 className="mt-7 font-serif text-5xl leading-[0.93] tracking-[-0.06em]">A field built around your exact moment.</h2><p className="mt-6 max-w-md font-sans text-base leading-7 text-[#c5d3d8]">Create your birth profile to unlock the calculation layer. Your natal positions, core numbers, Type, Strategy, Authority, and Profile become one evolving reference point.</p></div>
-            <div className="mt-10 border-t border-white/15 pt-6"><div className="grid grid-cols-2 gap-6"><div><p className="font-mono text-[9px] tracking-[0.12em] text-[#9db3c0]">INPUT</p><p className="mt-1 font-sans text-sm font-semibold">Birth details</p></div><div><p className="font-mono text-[9px] tracking-[0.12em] text-[#9db3c0]">OUTPUT</p><p className="mt-1 font-sans text-sm font-semibold">Living pattern file</p></div></div><Button onClick={() => setProfileOpen(true)} className="mt-8 h-12 w-full rounded-none bg-[#EF5D3F] font-sans text-[10px] font-bold tracking-[0.13em] text-white hover:bg-[#ff7658]">CREATE MY FIELD <ArrowUpRight className="ml-2 h-4 w-4" /></Button></div>
-          </div>
-        </div>
-      </section>
+    <section id="today" className="px-5 pb-16 md:px-9 lg:px-12 lg:pb-24"><div className="mx-auto grid max-w-[1500px] overflow-hidden bg-[#211B2A] text-[#F3F0E9] lg:grid-cols-[.9fr_1.1fr]"><div className="border-b border-white/15 p-7 md:p-10 lg:border-b-0 lg:border-r"><PathLabel accent>STEP C / ONE USEFUL MOVE</PathLabel><h2 className="mt-6 font-serif text-5xl leading-[.9] tracking-[-.06em] md:text-6xl">Today, make tomorrow easier.</h2><p className="mt-6 max-w-md font-sans text-[16px] leading-7 text-[#D9D1EF]">Choose one task that clears space for the version of you that has more energy. Complete the smallest useful version before you begin anything new.</p><div className="mt-8 flex items-center gap-3 font-mono text-[9px] tracking-[.14em] text-[#D9D1EF]"><Clock3 size={15} className="text-[#EF5D3F]" /> 10–20 MINUTES IS ENOUGH</div></div><div className="relative p-7 md:p-10"><span className="absolute right-7 top-7 font-mono text-[9px] tracking-[.15em] text-[#E1A0B1]">DAILY PROMPT / 01</span><p className="mt-12 font-serif text-[clamp(2.2rem,4vw,4rem)] leading-[.94] tracking-[-.055em]">“What can I finish gently, before I ask more of myself?”</p><p className="mt-7 max-w-lg font-sans text-[13px] leading-6 text-[#D9D1EF]">{hasProfile ? `This is your simple starter prompt, ${firstName}. Your calculated daily sources will appear here as the calculation layer comes online.` : "Save step A and Cosmic will keep your daily prompts, source signals, and reflections in one private place."}</p><div className="mt-9 flex flex-wrap gap-3"><Button onClick={handleSaveDailyPrompt} disabled={savePatternBriefReport.isPending} className="h-11 rounded-none bg-[#EF5D3F] px-5 font-mono text-[9px] tracking-[.14em] text-white hover:bg-[#D75D7F] disabled:opacity-60">{savePatternBriefReport.isPending ? "SAVING…" : "SAVE THIS READING"}<FileText className="ml-2" size={14} /></Button><Button onClick={openProfile} variant="outline" className="h-11 rounded-none border-white/25 bg-transparent px-5 font-mono text-[9px] tracking-[.14em] text-white hover:bg-white/10 hover:text-white">{hasProfile ? "VIEW MY DETAILS" : "COMPLETE STEP A"}</Button></div></div></div></section>
 
-      <section id="connection" className="border-t border-[#102936]/10 px-5 py-16 md:px-9 lg:ml-[76px] lg:px-12 lg:py-24">
-        <div className="mx-auto max-w-[1500px]">
-          <div className="flex flex-col justify-between gap-8 border-b border-[#102936]/10 pb-8 md:flex-row md:items-end"><div><p className="font-mono text-[10px] font-semibold tracking-[0.15em] text-[#EF5D3F]">THE COSMIC METHOD</p><h2 className="mt-4 max-w-2xl font-serif text-5xl leading-[0.93] tracking-[-0.055em] text-[#102936] md:text-6xl">A transparent engine for self-pattern recognition.</h2></div><p className="max-w-sm font-sans text-sm leading-6 text-[#55707d]">The interface is a front-end prototype for the exact calculation architecture described in your dossier.</p></div>
-          <div className="grid divide-y divide-[#102936]/10 md:grid-cols-3 md:divide-x md:divide-y-0">
-            {[
-              ["01", "Calculate", "Ephemeris positions, personal number cycles, and BodyGraph factors are resolved into a structured personal profile."],
-              ["02", "Connect", "The engine detects meaningful overlap between systems instead of presenting three isolated explanations."],
-              ["03", "Translate", "A daily Pattern Brief names the present signal in plain language and preserves the exact sources behind it."],
-            ].map(([number, title, body]) => <div key={number} className="py-8 md:px-8 md:first:pl-0 md:last:pr-0"><p className="font-mono text-[10px] font-semibold tracking-[0.14em] text-[#EF5D3F]">{number}</p><h3 className="mt-7 font-serif text-3xl tracking-[-0.04em] text-[#102936]">{title}</h3><p className="mt-3 max-w-sm font-sans text-sm leading-6 text-[#55707d]">{body}</p></div>)}
-          </div>
-        </div>
-      </section>
+    <section className="border-t border-[#102936]/10 px-5 py-12 md:px-9 lg:px-12"><div className="mx-auto flex max-w-[1500px] flex-col justify-between gap-8 md:flex-row md:items-end"><div><p className="font-mono text-[9px] font-semibold tracking-[.15em] text-[#EF5D3F]">MORE WAYS TO REFLECT</p><h2 className="mt-3 font-serif text-3xl tracking-[-.05em]">Use a studio when you want a different lens.</h2></div><div className="flex flex-wrap gap-3"><Link href="/tarot" className="inline-flex h-11 items-center gap-2 border border-[#102936]/15 bg-white/50 px-5 font-mono text-[9px] tracking-[.14em] hover:border-[#EF5D3F] hover:text-[#B63C5E]">TAROT STUDIO <ArrowUpRight size={14} /></Link><Link href="/palmistry" className="inline-flex h-11 items-center gap-2 border border-[#102936]/15 bg-white/50 px-5 font-mono text-[9px] tracking-[.14em] hover:border-[#EF5D3F] hover:text-[#B63C5E]">PALM GUIDE <ArrowUpRight size={14} /></Link></div></div></section>
 
-      <footer className="bg-[#071722] px-5 py-10 text-[#F3F0E9] md:px-9 lg:ml-[76px] lg:px-12">
-        <div className="mx-auto flex max-w-[1500px] flex-col justify-between gap-8 md:flex-row md:items-end"><div className="flex items-center gap-3"><img src="/manus-storage/cosmic-orbit-mark_02e07e29.png" alt="" className="h-12 w-12 scale-[1.42] object-cover" /><div><p className="font-sans text-xs font-extrabold tracking-[0.3em]">COSMIC WISDOM</p><p className="mt-1 font-mono text-[8px] tracking-[0.14em] text-[#9db3c0]"></p></div></div><div className="flex flex-wrap gap-x-7 gap-y-3 font-mono text-[9px] tracking-[0.13em] text-[#9db3c0]"><Link href="/tarot" className="transition-colors hover:text-white">TAROT STUDIO</Link><Link href="/palmistry" className="transition-colors hover:text-white">PALM GUIDE</Link><button onClick={() => toast("Coming in the product build", { description: "Relationship patterns will combine synastry, Human Design composites, and numerology bonds." })} className="transition-colors hover:text-white">RELATIONSHIP MODE</button><span>© 2026 COSMIC WISDOM</span></div></div>
-      </footer>
+    <footer className="bg-[#211B2A] px-5 py-10 text-[#F3F0E9] md:px-9 lg:px-12"><div className="mx-auto flex max-w-[1500px] flex-col justify-between gap-6 md:flex-row md:items-end"><div className="flex items-center gap-3"><img src="/manus-storage/cosmic-orbit-mark_02e07e29.png" alt="" className="h-10 w-10 scale-[1.42] object-cover" /><div><p className="font-sans text-[10px] font-extrabold tracking-[.3em]">COSMIC WISDOM</p><p className="mt-1 font-mono text-[8px] tracking-[.14em] text-[#BFC8E3]">A CLEARER WAY TO READ YOURSELF</p></div></div><p className="font-mono text-[8px] tracking-[.14em] text-[#BFC8E3]">© 2026 COSMIC WISDOM</p></div></footer>
 
-      {profileOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#071722]/60 p-4 backdrop-blur-sm sm:items-center" role="dialog" aria-modal="true" aria-labelledby="profile-title">
-          <form onSubmit={handleProfileSubmit} className="relative w-full max-w-[680px] bg-[#F3F0E9] p-6 shadow-[0_24px_80px_rgba(0,0,0,.35)] sm:p-9">
-            <button type="button" onClick={() => setProfileOpen(false)} aria-label="Close profile setup" className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center border border-[#102936]/15 text-[#102936] hover:border-[#EF5D3F] hover:text-[#EF5D3F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EF5D3F]"><X size={17} /></button>
-            <div className="pr-10"><p className="font-mono text-[10px] font-semibold tracking-[0.15em] text-[#EF5D3F]">NEW FIELD / PROTOTYPE</p><h2 id="profile-title" className="mt-3 font-serif text-4xl tracking-[-0.05em] text-[#102936]">Begin with the exact moment.</h2><p className="mt-3 max-w-lg font-sans text-sm leading-6 text-[#55707d]">This interface shows the MVP profile flow. In the live calculation build, these fields will generate your personal pattern file.</p></div>
-            <div className="mt-7 grid gap-5 sm:grid-cols-2"><label className="block sm:col-span-2"><span className="font-mono text-[9px] font-semibold tracking-[0.12em] text-[#55707d]">FULL NAME</span><input required name="fullName" placeholder="Your name" className="mt-2 h-12 w-full border-b border-[#102936]/25 bg-transparent px-0 font-sans text-base text-[#102936] outline-none placeholder:text-[#8b9ba2] focus:border-[#EF5D3F]" /></label><label className="block"><span className="font-mono text-[9px] font-semibold tracking-[0.12em] text-[#55707d]">BIRTH DATE</span><input required name="birthDate" type="date" className="mt-2 h-12 w-full border-b border-[#102936]/25 bg-transparent px-0 font-sans text-sm text-[#102936] outline-none focus:border-[#EF5D3F]" /></label><label className="block"><span className="font-mono text-[9px] font-semibold tracking-[0.12em] text-[#55707d]">BIRTH TIME</span><input required name="birthTime" type="time" className="mt-2 h-12 w-full border-b border-[#102936]/25 bg-transparent px-0 font-sans text-sm text-[#102936] outline-none focus:border-[#EF5D3F]" /></label><label className="block sm:col-span-2"><span className="font-mono text-[9px] font-semibold tracking-[0.12em] text-[#55707d]">BIRTH LOCATION</span><input required name="birthLocation" placeholder="City, country" className="mt-2 h-12 w-full border-b border-[#102936]/25 bg-transparent px-0 font-sans text-base text-[#102936] outline-none placeholder:text-[#8b9ba2] focus:border-[#EF5D3F]" /></label></div>
-            <label className="mt-5 flex cursor-pointer items-center justify-between gap-4 border border-dashed border-[#102936]/20 bg-white/35 px-4 py-3 transition-colors hover:border-[#EF5D3F] disabled:cursor-not-allowed sm:px-5"><span className="flex items-center gap-3"><span className="flex h-8 w-8 items-center justify-center rounded-full border border-[#102936]/15 text-[#EF5D3F]"><FileUp size={15} /></span><span><span className="block font-mono text-[9px] font-semibold tracking-[0.12em] text-[#55707d]">PROFILE ASSET / OPTIONAL</span><span className="mt-1 block font-sans text-[11px] leading-4 text-[#46616d]">{myProfile.data ? "Attach a PNG, JPG, WEBP, or PDF under 7.5 MB." : "Save your field first, then attach a chart or report."}</span></span></span><span className="font-mono text-[9px] font-semibold tracking-[0.12em] text-[#EF5D3F]">{uploadProfileAsset.isPending ? "UPLOADING…" : "ATTACH"}</span><input aria-label="Attach an optional Cosmic profile asset" disabled={!isAuthenticated || !myProfile.data || uploadProfileAsset.isPending} accept="image/jpeg,image/png,image/webp,application/pdf" type="file" className="sr-only" onChange={handleProfileAssetUpload} /></label>
-            <button type="button" onClick={handlePatternBriefReport} disabled={!isAuthenticated || !myProfile.data || savePatternBriefReport.isPending} className="mt-3 flex w-full items-center justify-between gap-4 border border-[#102936]/15 bg-[#102936] px-4 py-3 text-left text-white transition-colors hover:bg-[#EF5D3F] disabled:cursor-not-allowed disabled:opacity-50 sm:px-5"><span className="flex items-center gap-3"><FileText size={15} className="text-[#EF5D3F]" /><span><span className="block font-mono text-[9px] font-semibold tracking-[0.12em]">PATTERN BRIEF / TEXT REPORT</span><span className="mt-1 block font-sans text-[11px] leading-4 text-white/65">{myProfile.data ? "Store a dated copy of today’s brief in your private file history." : "Save your field to enable report exports."}</span></span></span><span className="font-mono text-[9px] font-semibold tracking-[0.12em]">{savePatternBriefReport.isPending ? "SAVING…" : "SAVE"}</span></button>
-            <div className="mt-8 flex flex-col justify-between gap-5 border-t border-[#102936]/10 pt-5 sm:flex-row sm:items-center"><p className="max-w-[270px] font-sans text-[11px] leading-5 text-[#55707d]">Cosmic is designed to show its source signals, never to reduce you to a prediction.</p><Button type="submit" disabled={saveProfile.isPending} className="h-12 rounded-none bg-[#102936] px-5 font-sans text-[10px] font-bold tracking-[0.13em] text-white hover:bg-[#EF5D3F] disabled:cursor-wait disabled:opacity-60">{saveProfile.isPending ? "SAVING YOUR FIELD…" : "SAVE MY FIELD"} <Sparkles className="ml-2 h-4 w-4" /></Button></div>
-          </form>
-        </div>
-      )}
-    </main>
-  );
+    {profileOpen && <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#211B2A]/70 p-4 backdrop-blur-sm sm:items-center" role="dialog" aria-modal="true" aria-labelledby="profile-title"><form onSubmit={handleProfileSubmit} className="relative max-h-[calc(100vh-2rem)] w-full max-w-[700px] overflow-y-auto bg-[#F3F0E9] p-6 shadow-[0_26px_90px_rgba(0,0,0,.35)] sm:p-9"><button type="button" onClick={() => setProfileOpen(false)} aria-label="Close personal details" className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center border border-[#102936]/15 hover:border-[#EF5D3F] hover:text-[#EF5D3F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EF5D3F]"><X size={17} /></button><div className="pr-10"><PathLabel accent>STEP A / YOUR PERSONAL FIELD</PathLabel><h2 id="profile-title" className="mt-4 font-serif text-4xl leading-[.94] tracking-[-.055em]">Four details. Then Cosmic does the translating.</h2><p className="mt-3 max-w-xl font-sans text-[13px] leading-6 text-[#55707d]">Your date, time, and place are used to build your private calculation context. No public profile is created, and you can update these details later.</p></div><div className="mt-7 grid gap-5 sm:grid-cols-2"><label className="block sm:col-span-2" htmlFor="fullName"><span className="font-mono text-[9px] font-semibold tracking-[.12em] text-[#55707d]">YOUR NAME</span><input id="fullName" required name="fullName" defaultValue={profile?.displayName ?? ""} placeholder="Your name" className="mt-2 h-12 w-full border-b border-[#102936]/25 bg-transparent px-0 font-sans text-base outline-none placeholder:text-[#8b9ba2] focus:border-[#EF5D3F]" /></label><label className="block" htmlFor="birthDate"><span className="font-mono text-[9px] font-semibold tracking-[.12em] text-[#55707d]">BIRTH DATE</span><input id="birthDate" required name="birthDate" type="date" defaultValue={profile?.birthDate ?? ""} className="mt-2 h-12 w-full border-b border-[#102936]/25 bg-transparent px-0 font-sans text-sm outline-none focus:border-[#EF5D3F]" /></label><label className="block" htmlFor="birthTime"><span className="font-mono text-[9px] font-semibold tracking-[.12em] text-[#55707d]">BIRTH TIME <em className="font-normal text-[#8B9BA2]">OPTIONAL</em></span><input id="birthTime" name="birthTime" type="time" defaultValue={profile?.birthTime ?? ""} className="mt-2 h-12 w-full border-b border-[#102936]/25 bg-transparent px-0 font-sans text-sm outline-none focus:border-[#EF5D3F]" /></label><label className="block sm:col-span-2" htmlFor="birthLocation"><span className="font-mono text-[9px] font-semibold tracking-[.12em] text-[#55707d]">BIRTH PLACE</span><input id="birthLocation" required name="birthLocation" defaultValue={profile?.birthLocation ?? ""} placeholder="City, country" className="mt-2 h-12 w-full border-b border-[#102936]/25 bg-transparent px-0 font-sans text-base outline-none placeholder:text-[#8b9ba2] focus:border-[#EF5D3F]" /></label></div><div className="mt-7 border-t border-[#102936]/10 pt-5"><div className="flex items-center justify-between gap-4"><div><p className="font-mono text-[9px] font-semibold tracking-[.13em] text-[#EF5D3F]">PRIVATE FILES / OPTIONAL</p><p className="mt-1 font-sans text-[11px] leading-5 text-[#55707d]">{hasProfile ? `${storedFileCount} protected file${storedFileCount === 1 ? "" : "s"} in your Cosmic space.` : "Save step A first, then attach a chart scan or supporting PDF."}</p></div><label className={`inline-flex cursor-pointer items-center gap-2 border px-3 py-2 font-mono text-[9px] tracking-[.13em] ${!isAuthenticated || !hasProfile || uploadProfileAsset.isPending ? "cursor-not-allowed border-[#102936]/10 text-[#8B9BA2]" : "border-[#102936]/20 text-[#102936] hover:border-[#EF5D3F] hover:text-[#EF5D3F]"}`}><FileUp size={14} />{uploadProfileAsset.isPending ? "UPLOADING…" : "ATTACH"}<input aria-label="Attach a private profile asset" disabled={!isAuthenticated || !hasProfile || uploadProfileAsset.isPending} accept="image/jpeg,image/png,image/webp,application/pdf" type="file" className="sr-only" onChange={handleProfileAssetUpload} /></label></div>{latestFile && <button type="button" onClick={handleOpenLatestFile} disabled={openPrivateFile.isPending} className="mt-3 flex w-full items-center justify-between border border-[#102936]/15 bg-[#211B2A] px-4 py-3 text-left text-white transition-colors hover:bg-[#EF5D3F] disabled:cursor-not-allowed disabled:opacity-50"><span><span className="block font-mono text-[9px] font-semibold tracking-[.13em]">OPEN LATEST PROTECTED FILE</span><span className="mt-1 block font-sans text-[11px] text-white/65">Only your signed-in Cosmic session can request this file.</span></span><ArrowUpRight size={16} /></button>}<button type="button" onClick={handleSaveDailyPrompt} disabled={!isAuthenticated || !hasProfile || savePatternBriefReport.isPending} className="mt-3 flex w-full items-center justify-between border border-[#102936]/15 bg-white/45 px-4 py-3 text-left transition-colors hover:border-[#EF5D3F] disabled:cursor-not-allowed disabled:opacity-50"><span><span className="block font-mono text-[9px] font-semibold tracking-[.13em] text-[#102936]">SAVE TODAY’S SIMPLE READING</span><span className="mt-1 block font-sans text-[11px] text-[#55707d]">Keep a private text copy in your Cosmic file space.</span></span><FileText className="text-[#EF5D3F]" size={16} /></button></div><div className="mt-8 flex flex-col justify-between gap-5 border-t border-[#102936]/10 pt-5 sm:flex-row sm:items-center"><p className="max-w-[290px] font-sans text-[11px] leading-5 text-[#55707d]">Cosmic starts with a clear translation. Detailed source terms remain available whenever you want to look underneath.</p><Button type="submit" disabled={saveProfile.isPending} className="h-12 rounded-none bg-[#102936] px-5 font-mono text-[9px] tracking-[.14em] text-white hover:bg-[#EF5D3F] disabled:opacity-60">{saveProfile.isPending ? "SAVING…" : hasProfile ? "UPDATE MY DETAILS" : "SAVE STEP A"}<Sparkles className="ml-2" size={15} /></Button></div></form></div>}
+  </main>;
 }

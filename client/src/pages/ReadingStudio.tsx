@@ -46,7 +46,10 @@ function TarotPlacementGuide({ onClose }: { onClose: () => void }) {
 export function TarotStudio() {
   const { isAuthenticated } = useAuth();
   const [drawnCards, setDrawnCards] = useState<typeof tarotDeck>([]);
-  const [placementGuide, setPlacementGuide] = useState(() => window.location.pathname.endsWith("/placement") || new URLSearchParams(window.location.search).get("guide") === "placement");
+  const [placementGuide, setPlacementGuide] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.location.pathname.endsWith("/placement") || new URLSearchParams(window.location.search).get("guide") === "placement";
+  });
   const { data: profile } = trpc.cosmic.getMyProfile.useQuery(undefined, { enabled: isAuthenticated });
   const utils = trpc.useUtils();
   const saveReading = trpc.cosmic.saveReading.useMutation({ onSuccess: () => { utils.cosmic.listReadings.invalidate(); toast("Tarot reflection saved", { description: "Your three-card orientation is now in your private reading history." }); }, onError: error => toast("We couldn’t save this reading", { description: error.message }) });

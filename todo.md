@@ -8,19 +8,19 @@
 - [x] Validate desktop and mobile hierarchy after the change.
 - [x] Upgrade Cosmic from a static website to a full-stack application.
 - [x] Create persistent data structures for user profiles, birth details, and pattern briefs.
-- [ ] Connect secure file storage for uploaded profile assets and generated report files.
-- [ ] Validate authenticated data and file access paths.
+- [x] Connect secure file storage for uploaded profile assets and generated report files.
+- [x] Validate authenticated data and file access paths.
 - [x] Fix the Home page useAuth reference introduced by the full-stack upgrade and verify the browser error is resolved.
 - [x] Define persistent tables for Cosmic profiles, private birth records, calculated pattern signals, daily briefs, and file references.
 - [x] Apply the Cosmic database migration without inserting mock user data.
 - [x] Add authenticated procedures for saving and retrieving a member’s own Cosmic data.
 - [x] Connect the profile creation form to persistent data storage with clear success and error states.
-- [ ] Validate data isolation, persistence, and the database test coverage.
+- [x] Validate data isolation, persistence, and the database test coverage.
 - [x] Add an end-to-end profile-asset upload flow that stores file metadata with the member profile.
 - [x] Add protected-procedure tests for unauthenticated access and cross-member file registration rejection.
-- [ ] Verify a real member profile can be saved and retrieved through the live authenticated flow.
-- [ ] Add a user-facing generated-report export flow that saves report metadata to private storage.
-- [ ] Verify the generated-report storage path through the website’s authenticated member flow.
+- [x] Verify a real member profile can be saved and retrieved through the live authenticated flow.
+- [x] Add a user-facing generated-report export flow that saves report metadata to private storage.
+- [x] Verify the generated-report storage path through the website’s authenticated member flow.
 - [x] Diagnose and fix the invalid OAuth state returned by the Cosmic callback.
 - [x] Verify a fresh member login establishes a valid authenticated session before persistence testing.
 - [x] Add a Tarot studio with a transparent three-card spread and interpreted reading state.
@@ -33,3 +33,26 @@
 - [x] Exercise the Palmistry camera-unavailable or permission-denied fallback in the browser.
 - [x] Add a visible browser-guided Tarot placement overlay with indexed physical spread targets.
 - [x] Re-verify the Tarot placement overlay on desktop and mobile.
+- [x] Audit every registered route, navigation control, interactive CTA, and current runtime error.
+- [x] Audit full-stack procedures, database helpers, storage paths, and member-ownership enforcement.
+- [x] Repair verified navigation, authentication, persistence, camera-guidance, and interaction defects.
+- [x] Add or strengthen automated tests for the repaired contracts and safety-critical feature paths.
+- [x] Polish loading, empty, error, disabled, focus, and responsive states across the public and studio pages.
+- [x] Complete a second browser, responsive, type-check, unit-test, and production-build validation pass.
+- [x] Reframe the main page as a clear A–B–C path: add details, see core signals, receive one useful daily action.
+- [x] Replace dense first-use chart language with plain-English labels and optional source-detail disclosure.
+- [x] Surface the saved member profile and personalized signal state prominently on the main page.
+- [x] Add practical reading guidance and a single next-step action rather than disconnected mystical indicators.
+- [x] Verify the simplified main-page journey with authenticated, profile-missing, and mobile states.
+- [x] Migrate existing legacy Cosmic file records into the protected member-only storage namespace.
+- [x] Reduce the main-page production payload by lazy-loading optional reading studios.
+- [x] Add an owner-scoped protected file open/download control and verify it succeeds for the authenticated member.
+- [x] Add automated isolation coverage for member-scoped profiles, files, reports, and readings.
+- [x] Trigger a fresh authenticated daily-reading export after the private-storage refactor and verify its protected retrieval.
+- [x] Verify the A–B–C main page in a profile-missing state without creating test personal data.
+- [x] Add member-isolation tests for report and reading list/save/retrieve contracts.
+- [x] Add a component-level Home profile-missing state test covering the real A–B–C copy and calls to action.
+- [x] Align local HTTP session-cookie attributes so authentication remains reliable outside HTTPS previews.
+- [x] Make global unauthorized detection resilient to tRPC error-code variations and failed redirects.
+- [x] Decode and validate protected storage keys safely at the proxy boundary.
+- [x] Guard the Tarot placement-route initializer for non-browser execution contexts.
