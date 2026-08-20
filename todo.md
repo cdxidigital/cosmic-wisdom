@@ -11,3 +11,8 @@
 - [ ] Connect secure file storage for uploaded profile assets and generated report files.
 - [ ] Validate authenticated data and file access paths.
 - [x] Fix the Home page useAuth reference introduced by the full-stack upgrade and verify the browser error is resolved.
+- [ ] Define persistent tables for Cosmic profiles, private birth records, calculated pattern signals, daily briefs, and file references.
+- [ ] Apply the Cosmic database migration without inserting mock user data.
+- [ ] Add authenticated procedures for saving and retrieving a member’s own Cosmic data.
+- [ ] Connect the profile creation form to persistent data storage with clear success and error states.
+- [ ] Validate data isolation, persistence, and the database test coverage.
