@@ -9,12 +9,16 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import { PalmistryStudio, TarotStudio } from "./pages/ReadingStudio";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/tarot/placement" component={TarotStudio} />
+      <Route path="/tarot" component={TarotStudio} />
+      <Route path="/palmistry" component={PalmistryStudio} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

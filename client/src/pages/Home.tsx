@@ -24,6 +24,7 @@ import {
   X,
 } from "lucide-react";
 import { ChangeEvent, FormEvent, useState } from "react";
+import { Link } from "wouter";
 
 const navItems = ["Overview", "Today", "Systems", "Connection"];
 
@@ -373,7 +374,7 @@ export default function Home() {
       </section>
 
       <footer className="bg-[#071722] px-5 py-10 text-[#F3F0E9] md:px-9 lg:ml-[76px] lg:px-12">
-        <div className="mx-auto flex max-w-[1500px] flex-col justify-between gap-8 md:flex-row md:items-end"><div className="flex items-center gap-3"><img src="/manus-storage/cosmic-orbit-mark_02e07e29.png" alt="" className="h-12 w-12 scale-[1.42] object-cover" /><div><p className="font-sans text-xs font-extrabold tracking-[0.3em]">COSMIC WISDOM</p><p className="mt-1 font-mono text-[8px] tracking-[0.14em] text-[#9db3c0]"></p></div></div><div className="flex flex-wrap gap-x-7 gap-y-3 font-mono text-[9px] tracking-[0.13em] text-[#9db3c0]"><button onClick={() => toast("Coming in the product build", { description: "Relationship patterns will combine synastry, Human Design composites, and numerology bonds." })} className="transition-colors hover:text-white">RELATIONSHIP MODE</button><button onClick={() => toast("Coming in the product build", { description: "Calculation source notes will make the underlying systems inspectable." })} className="transition-colors hover:text-white">METHOD NOTES</button><span>© 2026 COSMIC WISDOM</span></div></div>
+        <div className="mx-auto flex max-w-[1500px] flex-col justify-between gap-8 md:flex-row md:items-end"><div className="flex items-center gap-3"><img src="/manus-storage/cosmic-orbit-mark_02e07e29.png" alt="" className="h-12 w-12 scale-[1.42] object-cover" /><div><p className="font-sans text-xs font-extrabold tracking-[0.3em]">COSMIC WISDOM</p><p className="mt-1 font-mono text-[8px] tracking-[0.14em] text-[#9db3c0]"></p></div></div><div className="flex flex-wrap gap-x-7 gap-y-3 font-mono text-[9px] tracking-[0.13em] text-[#9db3c0]"><Link href="/tarot" className="transition-colors hover:text-white">TAROT STUDIO</Link><Link href="/palmistry" className="transition-colors hover:text-white">PALM GUIDE</Link><button onClick={() => toast("Coming in the product build", { description: "Relationship patterns will combine synastry, Human Design composites, and numerology bonds." })} className="transition-colors hover:text-white">RELATIONSHIP MODE</button><span>© 2026 COSMIC WISDOM</span></div></div>
       </footer>
 
       {profileOpen && (

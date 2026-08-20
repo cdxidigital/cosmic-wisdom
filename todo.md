@@ -23,3 +23,13 @@
 - [ ] Verify the generated-report storage path through the website’s authenticated member flow.
 - [x] Diagnose and fix the invalid OAuth state returned by the Cosmic callback.
 - [x] Verify a fresh member login establishes a valid authenticated session before persistence testing.
+- [x] Add a Tarot studio with a transparent three-card spread and interpreted reading state.
+- [x] Add a Palmistry studio with camera-guidance, clear consent, and no biometric-identification claim.
+- [x] Create an AR-ready browser guidance layer for card placement and palm framing with a non-camera fallback.
+- [x] Persist private Tarot and Palmistry reading metadata under the authenticated member account.
+- [x] Add consent text, retention controls, and clear limits for camera-derived palm imagery.
+- [x] Verify the expanded reading experience across desktop, mobile, and camera-unavailable states.
+- [x] Add a non-camera Tarot placement guide for physical three-card spreads.
+- [x] Exercise the Palmistry camera-unavailable or permission-denied fallback in the browser.
+- [x] Add a visible browser-guided Tarot placement overlay with indexed physical spread targets.
+- [x] Re-verify the Tarot placement overlay on desktop and mobile.

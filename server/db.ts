@@ -8,12 +8,14 @@ import {
   cosmicDailyBriefs,
   cosmicFiles,
   cosmicProfiles,
+  cosmicReadings,
   CosmicFile,
   CosmicProfile,
+  CosmicReading,
   InsertUser,
   users,
 } from "../drizzle/schema";
-import type { CosmicBriefInput, CosmicFileMetadataInput, CosmicProfileInput } from "./cosmicSchemas";
+import type { CosmicBriefInput, CosmicFileMetadataInput, CosmicProfileInput, CosmicReadingInput } from "./cosmicSchemas";
 import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -172,4 +174,30 @@ export async function createCosmicFileRecord(userId: number, input: CosmicFileMe
 export async function listCosmicFiles(userId: number) {
   const db = await requireDb();
   return db.select().from(cosmicFiles).where(eq(cosmicFiles.userId, userId)).orderBy(desc(cosmicFiles.createdAt));
+}
+
+export async function saveCosmicReading(userId: number, input: CosmicReadingInput): Promise<CosmicReading> {
+  const profile = await requireOwnedProfile(userId, input.profileId);
+  const db = await requireDb();
+  const result = await db.insert(cosmicReadings).values({
+    userId,
+    profileId: profile?.id ?? null,
+    readingType: input.readingType,
+    title: input.title,
+    readingContext: input.readingContext,
+    narrative: input.narrative,
+    inputData: input.inputData ?? null,
+    consentVersion: input.consentVersion,
+    // Camera is a momentary framing guide only. Raw palm frames are not retained by this flow.
+    cameraMediaStored: 0,
+  });
+  const insertedId = Number(result[0].insertId);
+  const reading = await db.select().from(cosmicReadings).where(eq(cosmicReadings.id, insertedId)).limit(1);
+  if (!reading[0]) throw new Error("The private reading could not be saved.");
+  return reading[0];
+}
+
+export async function listCosmicReadings(userId: number) {
+  const db = await requireDb();
+  return db.select().from(cosmicReadings).where(eq(cosmicReadings.userId, userId)).orderBy(desc(cosmicReadings.createdAt)).limit(24);
 }

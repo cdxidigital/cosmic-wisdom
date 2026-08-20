@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cosmicProfileInput, safeReportFileName } from "./cosmicSchemas";
+import { cosmicProfileInput, cosmicReadingInput, safeReportFileName } from "./cosmicSchemas";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
 
@@ -60,5 +60,19 @@ describe("Cosmic persistence contracts", () => {
         byteSize: 12,
       }),
     ).rejects.toThrow("Files can only be registered inside your Cosmic storage space.");
+  });
+
+  it("requires explicit camera-guidance consent before a Tarot or Palmistry reading can be saved", () => {
+    const baseReading = {
+      profileId: null,
+      readingType: "palmistry" as const,
+      title: "Palm line orientation",
+      readingContext: "heart-line",
+      narrative: "Use this observation as a reflective prompt rather than a fixed prediction.",
+      inputData: { cameraMediaStored: false },
+      consentVersion: "camera-guidance-v1" as const,
+    };
+    expect(cosmicReadingInput.safeParse({ ...baseReading, consentAccepted: false }).success).toBe(false);
+    expect(cosmicReadingInput.safeParse({ ...baseReading, consentAccepted: true }).success).toBe(true);
   });
 });

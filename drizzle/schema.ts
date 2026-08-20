@@ -81,6 +81,25 @@ export const cosmicDailyBriefs = mysqlTable(
   ],
 );
 
+/** Private Tarot and Palmistry reading records. Camera frames are never stored in this table. */
+export const cosmicReadings = mysqlTable(
+  "cosmicReadings",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+    profileId: int("profileId").references(() => cosmicProfiles.id, { onDelete: "set null" }),
+    readingType: mysqlEnum("readingType", ["tarot", "palmistry"]).notNull(),
+    title: varchar("title", { length: 180 }).notNull(),
+    readingContext: varchar("readingContext", { length: 80 }).notNull(),
+    narrative: text("narrative").notNull(),
+    inputData: json("inputData").$type<Record<string, unknown> | null>(),
+    consentVersion: varchar("consentVersion", { length: 32 }).notNull(),
+    cameraMediaStored: int("cameraMediaStored").default(0).notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  table => [index("cosmicReadings_userId_idx").on(table.userId), index("cosmicReadings_profileId_idx").on(table.profileId)],
+);
+
 /** Metadata for member files. The actual bytes remain in the S3 storage layer. */
 export const cosmicFiles = mysqlTable(
   "cosmicFiles",
@@ -104,3 +123,4 @@ export type InsertUser = typeof users.$inferInsert;
 export type CosmicProfile = typeof cosmicProfiles.$inferSelect;
 export type CosmicDailyBrief = typeof cosmicDailyBriefs.$inferSelect;
 export type CosmicFile = typeof cosmicFiles.$inferSelect;
+export type CosmicReading = typeof cosmicReadings.$inferSelect;

@@ -10,6 +10,7 @@ import {
   cosmicFileMetadataInput,
   cosmicProfileAssetUploadInput,
   cosmicProfileInput,
+  cosmicReadingInput,
   cosmicTextReportInput,
   safeReportFileName,
 } from "./cosmicSchemas";
@@ -18,8 +19,10 @@ import {
   getCosmicProfileByUserId,
   listCosmicDailyBriefs,
   listCosmicFiles,
+  listCosmicReadings,
   saveCosmicDailyBrief,
   saveCosmicProfile,
+  saveCosmicReading,
 } from "./db";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
@@ -42,6 +45,8 @@ export const appRouter = router({
     listDailyBriefs: protectedProcedure.query(({ ctx }) => listCosmicDailyBriefs(ctx.user.id)),
     saveDailyBrief: protectedProcedure.input(cosmicBriefInput).mutation(({ ctx, input }) => saveCosmicDailyBrief(ctx.user.id, input)),
     listFiles: protectedProcedure.query(({ ctx }) => listCosmicFiles(ctx.user.id)),
+    listReadings: protectedProcedure.query(({ ctx }) => listCosmicReadings(ctx.user.id)),
+    saveReading: protectedProcedure.input(cosmicReadingInput).mutation(({ ctx, input }) => saveCosmicReading(ctx.user.id, input)),
     registerStoredFile: protectedProcedure.input(cosmicFileMetadataInput).mutation(({ ctx, input }) => {
       const memberPrefix = `cosmic/${ctx.user.id}/`;
       if (!input.storageKey.startsWith(memberPrefix)) throw new Error("Files can only be registered inside your Cosmic storage space.");

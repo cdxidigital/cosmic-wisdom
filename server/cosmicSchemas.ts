@@ -44,6 +44,17 @@ export const cosmicProfileAssetUploadInput = z.object({
   contentBase64: z.string().min(4).max(10_500_000),
 });
 
+export const cosmicReadingInput = z.object({
+  profileId: z.number().int().positive().optional().nullable(),
+  readingType: z.enum(["tarot", "palmistry"]),
+  title: z.string().trim().min(3).max(180),
+  readingContext: z.string().trim().min(2).max(80),
+  narrative: z.string().trim().min(10).max(20_000),
+  inputData: z.record(z.string(), z.unknown()).optional().nullable(),
+  consentAccepted: z.literal(true, { error: "Consent is required before saving a private reading." }),
+  consentVersion: z.literal("camera-guidance-v1"),
+});
+
 export const safeReportFileName = (value: string) => {
   const normalized = value
     .toLowerCase()
@@ -58,3 +69,4 @@ export type CosmicProfileInput = z.infer<typeof cosmicProfileInput>;
 export type CosmicBriefInput = z.infer<typeof cosmicBriefInput>;
 export type CosmicFileMetadataInput = z.infer<typeof cosmicFileMetadataInput>;
 export type CosmicProfileAssetUploadInput = z.infer<typeof cosmicProfileAssetUploadInput>;
+export type CosmicReadingInput = z.infer<typeof cosmicReadingInput>;
