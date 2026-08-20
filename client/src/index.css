@@ -1,17 +1,17 @@
 /**
- * Astral Index visual system: contemporary esoteric editorialism, paper and ink contrast,
- * mineral-blue calculation language, and comet-vermilion activation accents.
+ * Eclipse Almanac visual system: high-fashion editorial type, warm paper contrast,
+ * ink-plum reading fields, pale periwinkle signals, and carmine activation accents.
  */
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Serif+Display:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,ital,wght@6..96,400;6..96,500;6..96,600;6..96,700;6..96,800;6..96,900;6..96,400i;6..96,500i;6..96,600i;6..96,700i&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Sans:ital,wdth,wght@0,75..100,400..700;1,75..100,400..700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "DM Serif Display", Georgia, serif;
-  --font-mono: "DM Mono", ui-monospace, monospace;
+  --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Bodoni Moda", Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --radius-sm: 0px;
   --radius-md: 0px;
   --radius-lg: 0px;
@@ -38,25 +38,25 @@
 }
 
 :root {
-  --background: oklch(0.95 0.007 88);
-  --foreground: oklch(0.22 0.026 223);
-  --card: oklch(0.98 0.005 88);
-  --card-foreground: oklch(0.22 0.026 223);
-  --popover: oklch(0.98 0.005 88);
-  --popover-foreground: oklch(0.22 0.026 223);
-  --primary: oklch(0.22 0.026 223);
-  --primary-foreground: oklch(0.97 0.006 88);
-  --secondary: oklch(0.91 0.012 220);
-  --secondary-foreground: oklch(0.22 0.026 223);
-  --muted: oklch(0.91 0.012 220);
-  --muted-foreground: oklch(0.47 0.032 221);
-  --accent: oklch(0.7 0.16 38);
-  --accent-foreground: oklch(0.98 0.005 88);
-  --destructive: oklch(0.58 0.22 26);
-  --destructive-foreground: oklch(0.98 0.005 88);
-  --border: oklch(0.32 0.025 223 / 15%);
-  --input: oklch(0.32 0.025 223 / 15%);
-  --ring: oklch(0.7 0.16 38);
+  --background: oklch(0.95 0.018 76);
+  --foreground: oklch(0.19 0.04 312);
+  --card: oklch(0.98 0.012 76);
+  --card-foreground: oklch(0.19 0.04 312);
+  --popover: oklch(0.98 0.012 76);
+  --popover-foreground: oklch(0.19 0.04 312);
+  --primary: oklch(0.19 0.04 312);
+  --primary-foreground: oklch(0.98 0.012 76);
+  --secondary: oklch(0.86 0.04 303);
+  --secondary-foreground: oklch(0.19 0.04 312);
+  --muted: oklch(0.9 0.027 305);
+  --muted-foreground: oklch(0.48 0.045 312);
+  --accent: oklch(0.51 0.16 10);
+  --accent-foreground: oklch(0.98 0.012 76);
+  --destructive: oklch(0.52 0.18 18);
+  --destructive-foreground: oklch(0.98 0.012 76);
+  --border: oklch(0.28 0.04 312 / 15%);
+  --input: oklch(0.28 0.04 312 / 15%);
+  --ring: oklch(0.51 0.16 10);
 }
 
 * { border-color: var(--border); }
@@ -66,9 +66,9 @@ html { scroll-behavior: smooth; }
 body {
   margin: 0;
   min-width: 320px;
-  background: #F3F0E9;
-  color: #102936;
-  font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  background: #F6F0E5;
+  color: #261F32;
+  font-family: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -80,7 +80,36 @@ button:not(:disabled), a[href] { cursor: pointer; }
 button:not(:disabled) { transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1); }
 button:not(:disabled):active { transform: scale(0.97); }
 
-::selection { background: #EF5D3F; color: white; }
+::selection { background: #B63C5E; color: white; }
+
+/* Transition the existing hand-built reading interface to the Eclipse Almanac palette. */
+[class~="bg-[#F3F0E9]"], [class~="bg-[#f3f0e9]"], [class~="bg-[#F8F6F1]"] { background-color: #F6F0E5 !important; }
+[class~="text-[#F3F0E9]"] { color: #F6F0E5 !important; }
+[class~="bg-[#071722]"] { background-color: #211B2A !important; }
+[class~="text-[#102936]"] { color: #261F32 !important; }
+[class~="bg-[#102936]"] { background-color: #261F32 !important; }
+[class~="text-[#EF5D3F]"] { color: #B63C5E !important; }
+[class~="bg-[#EF5D3F]"] { background-color: #B63C5E !important; }
+[class*="border-[#EF5D3F]"] { border-color: #B63C5E !important; }
+[class*="ring-[#EF5D3F]"] { --tw-ring-color: #B63C5E !important; }
+[class~="text-[#9bc2d5]"] { color: #D9D1EF !important; }
+[class~="text-[#c5d3d8]"] { color: #E3DAEA !important; }
+[class~="text-[#9db3c0]"] { color: #CBBFDC !important; }
+[class~="text-[#a2b6c0]"] { color: #C6B9D9 !important; }
+[class~="text-[#55707d]"] { color: #6E6079 !important; }
+[class~="text-[#36515d]"] { color: #493E56 !important; }
+[class~="text-[#46616d]"] { color: #5D4F68 !important; }
+[class~="text-[#6b828d]"] { color: #796A80 !important; }
+[class~="text-[#8b9ba2]"] { color: #96899B !important; }
+[class~="text-[#8fa7b5]"] { color: #C8BBD4 !important; }
+[class~="text-[#183448]"] { color: #3A2D46 !important; }
+[class~="bg-[#e6ecec]"] { background-color: #E5DEEE !important; }
+[class~="bg-[#e9eef0]"] { background-color: #EDE5F0 !important; }
+[class~="bg-[#91b6c6]"] { background-color: #C6B7D5 !important; }
+[class~="bg-[#80a7bd]"] { background-color: #B9A9CF !important; }
+[class*="hover:bg-[#EF5D3F]"]:hover { background-color: #C95172 !important; }
+
+.font-serif { font-variation-settings: "opsz" 72; }
 
 @media (prefers-reduced-motion: no-preference) {
   #overview > div > div.relative { animation: astral-enter 560ms cubic-bezier(0.23, 1, 0.32, 1) both; }

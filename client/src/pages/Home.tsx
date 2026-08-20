@@ -1,8 +1,11 @@
 /**
- * Astral Index visual system: contemporary esoteric editorialism, reading-desk asymmetry,
- * warm parchment against blue-black ink, mineral-blue diagrams, and comet-vermilion activations.
+ * Eclipse Almanac visual system: high-fashion editorial typography, warm paper contrast,
+ * ink-plum reading fields, periwinkle signals, and carmine activation accents.
  */
+import { useAuth } from "@/_core/hooks/useAuth";
+import { startLogin } from "@/const";
 import { Button } from "@/components/ui/button";
+import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import {
   ArrowUpRight,
@@ -10,6 +13,8 @@ import {
   ChevronDown,
   CircleDot,
   Compass,
+  FileText,
+  FileUp,
   Crosshair,
   Menu,
   MoveUpRight,
@@ -18,7 +23,7 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 
 const navItems = ["Overview", "Today", "Systems", "Connection"];
 
@@ -58,7 +63,7 @@ const signalSources = [
 function SignalTag({ children, accent = false }: { children: string; accent?: boolean }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 border px-2.5 py-1 font-mono text-[9px] font-semibold tracking-[0.14em] ${
+      className={`inline-flex items-center gap-1.5 border px-2.5 py-1 font-mono text-[9px] font-semibold leading-none tracking-[0.18em] ${
         accent
           ? "border-[#EF5D3F]/35 bg-[#EF5D3F]/10 text-[#EF5D3F]"
           : "border-[#1a2d3d]/15 bg-white/50 text-[#183448]"
@@ -74,6 +79,31 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [activeSystem, setActiveSystem] = useState("ASTRO");
+  const { isAuthenticated } = useAuth();
+  const utils = trpc.useUtils();
+  const myProfile = trpc.cosmic.getMyProfile.useQuery(undefined, { enabled: isAuthenticated });
+  const saveProfile = trpc.cosmic.saveProfile.useMutation({
+    onSuccess: profile => {
+      utils.cosmic.getMyProfile.setData(undefined, profile);
+      setProfileOpen(false);
+      toast("Your field has been saved", { description: "Your private Cosmic profile is now stored securely and ready for calculation." });
+    },
+    onError: error => toast("We couldn’t save your field", { description: error.message }),
+  });
+  const uploadProfileAsset = trpc.cosmic.uploadProfileAsset.useMutation({
+    onSuccess: () => {
+      utils.cosmic.listFiles.invalidate();
+      toast("Profile asset attached", { description: "Your file is stored securely with your private Cosmic profile." });
+    },
+    onError: error => toast("We couldn’t attach that file", { description: error.message }),
+  });
+  const savePatternBriefReport = trpc.cosmic.uploadTextReport.useMutation({
+    onSuccess: () => {
+      utils.cosmic.listFiles.invalidate();
+      toast("Pattern Brief saved", { description: "A private text report is now available in your Cosmic file history." });
+    },
+    onError: error => toast("We couldn’t save your Pattern Brief", { description: error.message }),
+  });
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -82,9 +112,87 @@ export default function Home() {
 
   const handleProfileSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setProfileOpen(false);
-    toast("Your field is ready for calculation", {
-      description: "The live ephemeris and BodyGraph engine will attach to this experience in the next product phase.",
+    if (!isAuthenticated) {
+      toast("Sign in to save your field", { description: "Cosmic protects your birth details inside your private member account." });
+      startLogin();
+      return;
+    }
+
+    const formData = new FormData(event.currentTarget);
+    saveProfile.mutate({
+      displayName: String(formData.get("fullName") ?? ""),
+      birthDate: String(formData.get("birthDate") ?? ""),
+      birthTime: String(formData.get("birthTime") ?? "") || null,
+      birthLocation: String(formData.get("birthLocation") ?? ""),
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
+    });
+  };
+
+  const handleProfileAssetUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    if (!isAuthenticated) {
+      toast("Sign in to attach a file", { description: "Cosmic keeps profile assets inside your private member account." });
+      startLogin();
+      return;
+    }
+    const profile = myProfile.data;
+    if (!profile) {
+      toast("Save your field first", { description: "Once your birth profile is saved, you can attach a chart scan, report, or supporting file." });
+      return;
+    }
+    if (file.size > 7_500_000) {
+      toast("That file is too large", { description: "Choose an image or PDF below 7.5 MB." });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = typeof reader.result === "string" ? reader.result.split(",")[1] : null;
+      if (!result) {
+        toast("We couldn’t read that file", { description: "Please try a PNG, JPG, WEBP, or PDF file." });
+        return;
+      }
+      uploadProfileAsset.mutate({
+        profileId: profile.id,
+        fileName: file.name,
+        mimeType: file.type as "image/jpeg" | "image/png" | "image/webp" | "application/pdf",
+        contentBase64: result,
+      });
+    };
+    reader.onerror = () => toast("We couldn’t read that file", { description: "Please choose a different file and try again." });
+    reader.readAsDataURL(file);
+  };
+
+  const handlePatternBriefReport = () => {
+    if (!isAuthenticated) {
+      toast("Sign in to save your Pattern Brief", { description: "Cosmic stores reading exports inside your private member account." });
+      startLogin();
+      return;
+    }
+    const profile = myProfile.data;
+    if (!profile) {
+      toast("Save your field first", { description: "Once your birth profile is saved, you can keep a dated copy of this reading." });
+      return;
+    }
+    const today = new Date().toISOString().slice(0, 10);
+    const report = [
+      "COSMIC WISDOM / PATTERN BRIEF",
+      `Profile: ${profile.displayName}`,
+      `Date: ${today}`,
+      "",
+      "The work is to make one clean decision — and let that decision restore your bandwidth.",
+      "",
+      "SOURCE SIGNALS",
+      "Astrology: Moon in Taurus · 12°08′ · 8th house",
+      "Numerology: Personal Day 6 · Harmony · responsibility",
+      "Human Design: Gate 57 activated · Spleen · instinct",
+    ].join("\n");
+    savePatternBriefReport.mutate({
+      profileId: profile.id,
+      fileName: `cosmic-wisdom-pattern-brief-${today}.txt`,
+      content: report,
     });
   };
 
@@ -132,7 +240,7 @@ export default function Home() {
         </div>
         <nav className="hidden items-center gap-7 md:flex" aria-label="Main navigation">
           {navItems.map((item, index) => (
-            <button key={item} onClick={() => scrollTo(["overview", "today", "systems", "connection"][index])} className="font-sans text-[11px] font-bold tracking-[0.08em] text-[#36515d] transition-colors hover:text-[#EF5D3F] focus-visible:outline-none focus-visible:text-[#EF5D3F]">
+            <button key={item} onClick={() => scrollTo(["overview", "today", "systems", "connection"][index])} className="font-sans text-[10px] font-semibold uppercase tracking-[0.16em] text-[#36515d] transition-colors hover:text-[#EF5D3F] focus-visible:outline-none focus-visible:text-[#EF5D3F]">
               {item}
             </button>
           ))}
@@ -158,7 +266,7 @@ export default function Home() {
       <section id="overview" className="relative px-5 pb-20 pt-5 md:px-9 lg:ml-[76px] lg:px-12 lg:pb-28 lg:pt-8">
         <div className="relative mx-auto max-w-[1500px] overflow-hidden bg-[#071722] shadow-[0_26px_80px_rgba(7,23,34,0.2)]">
           <img src="/manus-storage/cosmic-hero-field_09e49a6f.png" alt="Abstract orbital field in a midnight observatory palette" className="absolute inset-0 h-full w-full object-cover opacity-80" />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,23,34,0.98)_2%,rgba(7,23,34,0.86)_43%,rgba(7,23,34,0.25)_78%,rgba(7,23,34,0.2)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(33,27,42,0.98)_2%,rgba(33,27,42,0.86)_43%,rgba(33,27,42,0.28)_78%,rgba(33,27,42,0.2)_100%)]" />
           <div className="absolute left-0 top-0 h-full w-1 bg-[#EF5D3F]" />
           <div className="relative grid min-h-[620px] gap-8 px-6 py-8 sm:px-10 md:px-14 md:py-12 lg:grid-cols-[minmax(0,1.28fr)_minmax(340px,.72fr)] lg:px-16 lg:py-16">
             <div className="flex flex-col justify-between">
@@ -167,11 +275,11 @@ export default function Home() {
                   <SignalTag accent>TODAY / 20 AUG</SignalTag>
                   <span className="font-mono text-[10px] tracking-[0.12em] text-[#9db3c0]">THURSDAY · PERSONAL DAY 6</span>
                 </div>
-                <h1 className="mt-10 max-w-[720px] font-serif text-[clamp(3.8rem,8vw,8.5rem)] leading-[0.87] tracking-[-0.06em] text-[#F3F0E9]">
+                <h1 className="mt-10 max-w-[720px] font-serif text-[clamp(3.8rem,8vw,8.5rem)] leading-[0.84] tracking-[-0.068em] text-[#F3F0E9]">
                   Your inner weather,<br />
                   <em className="font-light text-[#9bc2d5]">in focus.</em>
                 </h1>
-                <p className="mt-7 max-w-[520px] font-sans text-base leading-7 text-[#c5d3d8] md:text-lg">
+                <p className="mt-8 max-w-[490px] font-sans text-[15px] font-medium leading-[1.75] text-[#c5d3d8] md:text-[17px]">
                   One daily lens for the three systems that shape your rhythm: astrology, numerology, and Human Design.
                 </p>
                 <div className="mt-9 flex flex-wrap gap-3">
@@ -215,8 +323,8 @@ export default function Home() {
         <div className="mx-auto grid max-w-[1500px] gap-12 lg:grid-cols-[0.78fr_1.22fr] lg:gap-20">
           <div className="lg:pt-4">
             <div className="flex items-center gap-3"><span className="h-px w-9 bg-[#EF5D3F]" /><p className="font-mono text-[10px] font-semibold tracking-[0.15em] text-[#EF5D3F]">TODAY’S FIELD</p></div>
-            <h2 className="mt-5 max-w-sm font-serif text-5xl leading-[0.94] tracking-[-0.055em] text-[#102936] md:text-6xl">The signal is more useful when you can see its source.</h2>
-            <p className="mt-7 max-w-md font-sans text-base leading-7 text-[#55707d]">Cosmic does not flatten your data into a generic forecast. Each brief is an inspectable synthesis of calculated placements, activated gates, and your personal number cycle.</p>
+            <h2 className="mt-5 max-w-sm font-serif text-5xl leading-[0.89] tracking-[-0.06em] text-[#102936] md:text-6xl">The signal is more useful when you can see its source.</h2>
+            <p className="mt-8 max-w-md font-sans text-[15px] leading-[1.8] text-[#55707d]">Cosmic does not flatten your data into a generic forecast. Each brief is an inspectable synthesis of calculated placements, activated gates, and your personal number cycle.</p>
             <button onClick={() => scrollTo("connection")} className="mt-8 flex items-center gap-2 font-sans text-[10px] font-bold tracking-[0.13em] text-[#102936] transition-colors hover:text-[#EF5D3F] focus-visible:outline-none focus-visible:text-[#EF5D3F]">HOW THE ENGINE THINKS <ArrowUpRight size={14} /></button>
           </div>
           <div className="relative grid gap-px overflow-hidden bg-[#102936]/15 md:grid-cols-3">
@@ -224,8 +332,8 @@ export default function Home() {
               <button key={system.key} onClick={() => setActiveSystem(system.key)} className={`group relative min-h-[320px] overflow-hidden p-6 text-left transition-colors focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EF5D3F] ${activeSystem === system.key ? "bg-[#102936] text-[#F3F0E9]" : "bg-[#F8F6F1] text-[#102936] hover:bg-[#e9eef0]"}`}>
                 <span className={`absolute right-5 top-3 font-serif text-7xl leading-none tracking-[-0.1em] transition-colors ${activeSystem === system.key ? "text-white/10" : "text-[#102936]/5"}`}>{system.mark}</span>
                 <div className="relative flex h-full flex-col justify-between">
-                  <div><div className="flex items-center justify-between"><span className={`font-mono text-[10px] font-semibold tracking-[0.14em] ${activeSystem === system.key ? "text-[#EF5D3F]" : "text-[#55707d]"}`}>0{index + 1} / {system.key}</span><span className={`h-2 w-2 rounded-full ${activeSystem === system.key ? "bg-[#EF5D3F]" : "bg-[#91b6c6]"}`} /></div><h3 className="mt-10 font-serif text-3xl tracking-[-0.045em]">{system.title}</h3><p className={`mt-3 font-sans text-sm font-bold ${activeSystem === system.key ? "text-white" : "text-[#102936]"}`}>{system.metric}</p><p className={`mt-1 font-mono text-[9px] tracking-[0.1em] ${activeSystem === system.key ? "text-[#9db3c0]" : "text-[#6b828d]"}`}>{system.detail}</p></div>
-                  <div><p className={`max-w-[240px] font-sans text-sm leading-6 ${activeSystem === system.key ? "text-[#c5d3d8]" : "text-[#55707d]"}`}>{system.copy}</p><span className="mt-6 flex items-center gap-2 font-sans text-[10px] font-bold tracking-[0.12em]">VIEW SIGNAL <ArrowUpRight size={13} /></span></div>
+                  <div><div className="flex items-center justify-between"><span className={`font-mono text-[9px] font-semibold leading-none tracking-[0.18em] ${activeSystem === system.key ? "text-[#EF5D3F]" : "text-[#55707d]"}`}>0{index + 1} / {system.key}</span><span className={`h-2 w-2 rounded-full ${activeSystem === system.key ? "bg-[#EF5D3F]" : "bg-[#91b6c6]"}`} /></div><h3 className="mt-10 font-serif text-3xl leading-[0.92] tracking-[-0.055em]">{system.title}</h3><p className={`mt-4 font-sans text-[13px] font-bold ${activeSystem === system.key ? "text-white" : "text-[#102936]"}`}>{system.metric}</p><p className={`mt-1.5 font-mono text-[8px] leading-none tracking-[0.15em] ${activeSystem === system.key ? "text-[#9db3c0]" : "text-[#6b828d]"}`}>{system.detail}</p></div>
+                  <div><p className={`max-w-[240px] font-sans text-[13px] leading-[1.7] ${activeSystem === system.key ? "text-[#c5d3d8]" : "text-[#55707d]"}`}>{system.copy}</p><span className="mt-6 flex items-center gap-2 font-sans text-[9px] font-bold tracking-[0.16em]">VIEW SIGNAL <ArrowUpRight size={13} /></span></div>
                 </div>
               </button>
             ))}
@@ -273,8 +381,10 @@ export default function Home() {
           <form onSubmit={handleProfileSubmit} className="relative w-full max-w-[680px] bg-[#F3F0E9] p-6 shadow-[0_24px_80px_rgba(0,0,0,.35)] sm:p-9">
             <button type="button" onClick={() => setProfileOpen(false)} aria-label="Close profile setup" className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center border border-[#102936]/15 text-[#102936] hover:border-[#EF5D3F] hover:text-[#EF5D3F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EF5D3F]"><X size={17} /></button>
             <div className="pr-10"><p className="font-mono text-[10px] font-semibold tracking-[0.15em] text-[#EF5D3F]">NEW FIELD / PROTOTYPE</p><h2 id="profile-title" className="mt-3 font-serif text-4xl tracking-[-0.05em] text-[#102936]">Begin with the exact moment.</h2><p className="mt-3 max-w-lg font-sans text-sm leading-6 text-[#55707d]">This interface shows the MVP profile flow. In the live calculation build, these fields will generate your personal pattern file.</p></div>
-            <div className="mt-7 grid gap-5 sm:grid-cols-2"><label className="block sm:col-span-2"><span className="font-mono text-[9px] font-semibold tracking-[0.12em] text-[#55707d]">FULL NAME</span><input required placeholder="Your name" className="mt-2 h-12 w-full border-b border-[#102936]/25 bg-transparent px-0 font-sans text-base text-[#102936] outline-none placeholder:text-[#8b9ba2] focus:border-[#EF5D3F]" /></label><label className="block"><span className="font-mono text-[9px] font-semibold tracking-[0.12em] text-[#55707d]">BIRTH DATE</span><input required type="date" className="mt-2 h-12 w-full border-b border-[#102936]/25 bg-transparent px-0 font-sans text-sm text-[#102936] outline-none focus:border-[#EF5D3F]" /></label><label className="block"><span className="font-mono text-[9px] font-semibold tracking-[0.12em] text-[#55707d]">BIRTH TIME</span><input required type="time" className="mt-2 h-12 w-full border-b border-[#102936]/25 bg-transparent px-0 font-sans text-sm text-[#102936] outline-none focus:border-[#EF5D3F]" /></label><label className="block sm:col-span-2"><span className="font-mono text-[9px] font-semibold tracking-[0.12em] text-[#55707d]">BIRTH LOCATION</span><input required placeholder="City, country" className="mt-2 h-12 w-full border-b border-[#102936]/25 bg-transparent px-0 font-sans text-base text-[#102936] outline-none placeholder:text-[#8b9ba2] focus:border-[#EF5D3F]" /></label></div>
-            <div className="mt-8 flex flex-col justify-between gap-5 border-t border-[#102936]/10 pt-5 sm:flex-row sm:items-center"><p className="max-w-[270px] font-sans text-[11px] leading-5 text-[#55707d]">Cosmic is designed to show its source signals, never to reduce you to a prediction.</p><Button type="submit" className="h-12 rounded-none bg-[#102936] px-5 font-sans text-[10px] font-bold tracking-[0.13em] text-white hover:bg-[#EF5D3F]">PREVIEW MY FIELD <Sparkles className="ml-2 h-4 w-4" /></Button></div>
+            <div className="mt-7 grid gap-5 sm:grid-cols-2"><label className="block sm:col-span-2"><span className="font-mono text-[9px] font-semibold tracking-[0.12em] text-[#55707d]">FULL NAME</span><input required name="fullName" placeholder="Your name" className="mt-2 h-12 w-full border-b border-[#102936]/25 bg-transparent px-0 font-sans text-base text-[#102936] outline-none placeholder:text-[#8b9ba2] focus:border-[#EF5D3F]" /></label><label className="block"><span className="font-mono text-[9px] font-semibold tracking-[0.12em] text-[#55707d]">BIRTH DATE</span><input required name="birthDate" type="date" className="mt-2 h-12 w-full border-b border-[#102936]/25 bg-transparent px-0 font-sans text-sm text-[#102936] outline-none focus:border-[#EF5D3F]" /></label><label className="block"><span className="font-mono text-[9px] font-semibold tracking-[0.12em] text-[#55707d]">BIRTH TIME</span><input required name="birthTime" type="time" className="mt-2 h-12 w-full border-b border-[#102936]/25 bg-transparent px-0 font-sans text-sm text-[#102936] outline-none focus:border-[#EF5D3F]" /></label><label className="block sm:col-span-2"><span className="font-mono text-[9px] font-semibold tracking-[0.12em] text-[#55707d]">BIRTH LOCATION</span><input required name="birthLocation" placeholder="City, country" className="mt-2 h-12 w-full border-b border-[#102936]/25 bg-transparent px-0 font-sans text-base text-[#102936] outline-none placeholder:text-[#8b9ba2] focus:border-[#EF5D3F]" /></label></div>
+            <label className="mt-5 flex cursor-pointer items-center justify-between gap-4 border border-dashed border-[#102936]/20 bg-white/35 px-4 py-3 transition-colors hover:border-[#EF5D3F] disabled:cursor-not-allowed sm:px-5"><span className="flex items-center gap-3"><span className="flex h-8 w-8 items-center justify-center rounded-full border border-[#102936]/15 text-[#EF5D3F]"><FileUp size={15} /></span><span><span className="block font-mono text-[9px] font-semibold tracking-[0.12em] text-[#55707d]">PROFILE ASSET / OPTIONAL</span><span className="mt-1 block font-sans text-[11px] leading-4 text-[#46616d]">{myProfile.data ? "Attach a PNG, JPG, WEBP, or PDF under 7.5 MB." : "Save your field first, then attach a chart or report."}</span></span></span><span className="font-mono text-[9px] font-semibold tracking-[0.12em] text-[#EF5D3F]">{uploadProfileAsset.isPending ? "UPLOADING…" : "ATTACH"}</span><input aria-label="Attach an optional Cosmic profile asset" disabled={!isAuthenticated || !myProfile.data || uploadProfileAsset.isPending} accept="image/jpeg,image/png,image/webp,application/pdf" type="file" className="sr-only" onChange={handleProfileAssetUpload} /></label>
+            <button type="button" onClick={handlePatternBriefReport} disabled={!isAuthenticated || !myProfile.data || savePatternBriefReport.isPending} className="mt-3 flex w-full items-center justify-between gap-4 border border-[#102936]/15 bg-[#102936] px-4 py-3 text-left text-white transition-colors hover:bg-[#EF5D3F] disabled:cursor-not-allowed disabled:opacity-50 sm:px-5"><span className="flex items-center gap-3"><FileText size={15} className="text-[#EF5D3F]" /><span><span className="block font-mono text-[9px] font-semibold tracking-[0.12em]">PATTERN BRIEF / TEXT REPORT</span><span className="mt-1 block font-sans text-[11px] leading-4 text-white/65">{myProfile.data ? "Store a dated copy of today’s brief in your private file history." : "Save your field to enable report exports."}</span></span></span><span className="font-mono text-[9px] font-semibold tracking-[0.12em]">{savePatternBriefReport.isPending ? "SAVING…" : "SAVE"}</span></button>
+            <div className="mt-8 flex flex-col justify-between gap-5 border-t border-[#102936]/10 pt-5 sm:flex-row sm:items-center"><p className="max-w-[270px] font-sans text-[11px] leading-5 text-[#55707d]">Cosmic is designed to show its source signals, never to reduce you to a prediction.</p><Button type="submit" disabled={saveProfile.isPending} className="h-12 rounded-none bg-[#102936] px-5 font-sans text-[10px] font-bold tracking-[0.13em] text-white hover:bg-[#EF5D3F] disabled:cursor-wait disabled:opacity-60">{saveProfile.isPending ? "SAVING YOUR FIELD…" : "SAVE MY FIELD"} <Sparkles className="ml-2 h-4 w-4" /></Button></div>
           </form>
         </div>
       )}

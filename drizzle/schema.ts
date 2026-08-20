@@ -1,17 +1,21 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
-
 /**
- * Core user table backing auth flow.
- * Extend this file with additional tables as your product grows.
- * Columns use camelCase to match both database fields and generated types.
+ * Cosmic persistence model: member-owned personal pattern records stay relational,
+ * calculated detail stays structured JSON, and file bytes stay in object storage.
  */
+import {
+  index,
+  int,
+  json,
+  mysqlEnum,
+  mysqlTable,
+  text,
+  timestamp,
+  uniqueIndex,
+  varchar,
+} from "drizzle-orm/mysql-core";
+
 export const users = mysqlTable("users", {
-  /**
-   * Surrogate primary key. Auto-incremented numeric value managed by the database.
-   * Use this for relations between tables.
-   */
   id: int("id").autoincrement().primaryKey(),
-  /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
@@ -22,7 +26,81 @@ export const users = mysqlTable("users", {
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
 });
 
+/** One private primary pattern profile per authenticated member. */
+export const cosmicProfiles = mysqlTable(
+  "cosmicProfiles",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+    displayName: varchar("displayName", { length: 120 }).notNull(),
+    birthDate: varchar("birthDate", { length: 10 }).notNull(),
+    birthTime: varchar("birthTime", { length: 5 }),
+    birthLocation: varchar("birthLocation", { length: 512 }).notNull(),
+    timezone: varchar("timezone", { length: 64 }).notNull(),
+    calculationStatus: mysqlEnum("calculationStatus", ["pending", "ready", "stale", "failed"]).default("pending").notNull(),
+    calculationVersion: varchar("calculationVersion", { length: 40 }),
+    calculationData: json("calculationData").$type<Record<string, unknown> | null>(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  table => [uniqueIndex("cosmicProfiles_userId_unique").on(table.userId)],
+);
+
+/** Auditable source signals that inform a Cosmic pattern reading. */
+export const cosmicPatternSignals = mysqlTable(
+  "cosmicPatternSignals",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    profileId: int("profileId").notNull().references(() => cosmicProfiles.id, { onDelete: "cascade" }),
+    sourceSystem: mysqlEnum("sourceSystem", ["astrology", "numerology", "human_design"]).notNull(),
+    signalKey: varchar("signalKey", { length: 120 }).notNull(),
+    label: varchar("label", { length: 200 }).notNull(),
+    detail: text("detail"),
+    signalData: json("signalData").$type<Record<string, unknown> | null>(),
+    observedAt: timestamp("observedAt").defaultNow().notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  table => [index("cosmicPatternSignals_profileId_idx").on(table.profileId)],
+);
+
+/** A dated, generated daily reading tied to a member’s private profile. */
+export const cosmicDailyBriefs = mysqlTable(
+  "cosmicDailyBriefs",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    profileId: int("profileId").notNull().references(() => cosmicProfiles.id, { onDelete: "cascade" }),
+    briefDate: varchar("briefDate", { length: 10 }).notNull(),
+    narrative: text("narrative").notNull(),
+    sourceSummary: json("sourceSummary").$type<Record<string, unknown> | null>(),
+    generatedAt: timestamp("generatedAt").defaultNow().notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  table => [
+    uniqueIndex("cosmicDailyBriefs_profileId_briefDate_unique").on(table.profileId, table.briefDate),
+    index("cosmicDailyBriefs_profileId_idx").on(table.profileId),
+  ],
+);
+
+/** Metadata for member files. The actual bytes remain in the S3 storage layer. */
+export const cosmicFiles = mysqlTable(
+  "cosmicFiles",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+    profileId: int("profileId").references(() => cosmicProfiles.id, { onDelete: "set null" }),
+    fileKind: mysqlEnum("fileKind", ["report", "profile_asset", "attachment"]).notNull(),
+    storageKey: varchar("storageKey", { length: 768 }).notNull().unique(),
+    storageUrl: varchar("storageUrl", { length: 1024 }).notNull(),
+    originalFilename: varchar("originalFilename", { length: 512 }).notNull(),
+    mimeType: varchar("mimeType", { length: 160 }).notNull(),
+    byteSize: int("byteSize"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  table => [index("cosmicFiles_userId_idx").on(table.userId), index("cosmicFiles_profileId_idx").on(table.profileId)],
+);
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
-
-// TODO: Add your tables here
+export type CosmicProfile = typeof cosmicProfiles.$inferSelect;
+export type CosmicDailyBrief = typeof cosmicDailyBriefs.$inferSelect;
+export type CosmicFile = typeof cosmicFiles.$inferSelect;

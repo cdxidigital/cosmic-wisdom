@@ -1,18 +1,25 @@
 # Typography Revision Tasks
 
-- [ ] Select a more characterful editorial display, text, and utility type system.
-- [ ] Update global font imports and design tokens.
-- [ ] Refine headline, navigation, signal-label, and body-text rhythm.
-- [ ] Define an editorial colour palette with clear reading-surface contrast.
-- [ ] Apply the revised colour system to hero, cards, navigation, and activation states.
-- [ ] Validate desktop and mobile hierarchy after the change.
-- [ ] Upgrade Cosmic from a static website to a full-stack application.
-- [ ] Create persistent data structures for user profiles, birth details, and pattern briefs.
+- [x] Select a more characterful editorial display, text, and utility type system.
+- [x] Update global font imports and design tokens.
+- [x] Refine headline, navigation, signal-label, and body-text rhythm.
+- [x] Define an editorial colour palette with clear reading-surface contrast.
+- [x] Apply the revised colour system to hero, cards, navigation, and activation states.
+- [x] Validate desktop and mobile hierarchy after the change.
+- [x] Upgrade Cosmic from a static website to a full-stack application.
+- [x] Create persistent data structures for user profiles, birth details, and pattern briefs.
 - [ ] Connect secure file storage for uploaded profile assets and generated report files.
 - [ ] Validate authenticated data and file access paths.
 - [x] Fix the Home page useAuth reference introduced by the full-stack upgrade and verify the browser error is resolved.
-- [ ] Define persistent tables for Cosmic profiles, private birth records, calculated pattern signals, daily briefs, and file references.
-- [ ] Apply the Cosmic database migration without inserting mock user data.
-- [ ] Add authenticated procedures for saving and retrieving a member’s own Cosmic data.
-- [ ] Connect the profile creation form to persistent data storage with clear success and error states.
+- [x] Define persistent tables for Cosmic profiles, private birth records, calculated pattern signals, daily briefs, and file references.
+- [x] Apply the Cosmic database migration without inserting mock user data.
+- [x] Add authenticated procedures for saving and retrieving a member’s own Cosmic data.
+- [x] Connect the profile creation form to persistent data storage with clear success and error states.
 - [ ] Validate data isolation, persistence, and the database test coverage.
+- [x] Add an end-to-end profile-asset upload flow that stores file metadata with the member profile.
+- [x] Add protected-procedure tests for unauthenticated access and cross-member file registration rejection.
+- [ ] Verify a real member profile can be saved and retrieved through the live authenticated flow.
+- [ ] Add a user-facing generated-report export flow that saves report metadata to private storage.
+- [ ] Verify the generated-report storage path through the website’s authenticated member flow.
+- [x] Diagnose and fix the invalid OAuth state returned by the Cosmic callback.
+- [x] Verify a fresh member login establishes a valid authenticated session before persistence testing.
