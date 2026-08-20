@@ -56,3 +56,14 @@
 - [x] Make global unauthorized detection resilient to tRPC error-code variations and failed redirects.
 - [x] Decode and validate protected storage keys safely at the proxy boundary.
 - [x] Guard the Tarot placement-route initializer for non-browser execution contexts.
+- [ ] Select and configure a reliable natal-chart calculation source with documented ephemeris inputs.
+- [ ] Add a member-owned natal-chart calculation record with source metadata and recalculation status.
+- [ ] Implement an authenticated natal-chart calculation procedure using saved birth details.
+- [ ] Replace placeholder core signals with real Sun, Moon, Rising, house, and aspect outputs.
+- [ ] Generate a plain-language natal reading grounded in calculated placements and aspect data.
+- [ ] Add a clear chart-reading dashboard with source details available on demand.
+- [ ] Validate results against known natal-chart reference data and persist only the member’s own reading.
+- [x] Add a homepage meta keywords tag containing 3–8 focused astrology keywords.
+- [x] Set the homepage document title to 30–60 characters.
+- [x] Add meaningful alt text to every homepage image.
+- [x] Verify the final homepage metadata quantities, title length, and image alt coverage.
