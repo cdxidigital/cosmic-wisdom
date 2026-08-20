@@ -7,15 +7,18 @@ import { drizzle } from "drizzle-orm/mysql2";
 import {
   cosmicDailyBriefs,
   cosmicFiles,
+  cosmicNatalCharts,
   cosmicProfiles,
   cosmicReadings,
   CosmicFile,
+  CosmicNatalChart,
   CosmicProfile,
   CosmicReading,
   InsertUser,
   users,
 } from "../drizzle/schema";
 import type { CosmicBriefInput, CosmicFileMetadataInput, CosmicProfileInput, CosmicReadingInput } from "./cosmicSchemas";
+import type { NatalCalculation } from "./natalAstrology";
 import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -220,4 +223,54 @@ export async function saveCosmicReading(userId: number, input: CosmicReadingInpu
 export async function listCosmicReadings(userId: number) {
   const db = await requireDb();
   return db.select().from(cosmicReadings).where(eq(cosmicReadings.userId, userId)).orderBy(desc(cosmicReadings.createdAt)).limit(24);
+}
+
+export async function getCosmicNatalChartByUserId(userId: number): Promise<CosmicNatalChart | null> {
+  const profile = await requireOwnedProfile(userId);
+  if (!profile) return null;
+  const db = await requireDb();
+  const result = await db.select().from(cosmicNatalCharts).where(eq(cosmicNatalCharts.profileId, profile.id)).limit(1);
+  return result[0] ?? null;
+}
+
+export async function saveCosmicNatalChart(userId: number, calculation: NatalCalculation): Promise<CosmicNatalChart> {
+  const profile = await requireOwnedProfile(userId);
+  if (!profile) throw new Error("Save your private birth details before calculating a natal chart.");
+  const db = await requireDb();
+  await db.insert(cosmicNatalCharts).values({
+    userId,
+    profileId: profile.id,
+    provider: calculation.provider,
+    providerVersion: calculation.providerVersion,
+    calculationStatus: "ready",
+    chartData: calculation.chartData,
+    readingData: calculation.readingData,
+    sourceData: calculation.sourceData,
+    calculatedAt: new Date(calculation.calculatedAt),
+  }).onDuplicateKeyUpdate({
+    set: {
+      provider: calculation.provider,
+      providerVersion: calculation.providerVersion,
+      calculationStatus: "ready",
+      chartData: calculation.chartData,
+      readingData: calculation.readingData,
+      sourceData: calculation.sourceData,
+      calculatedAt: new Date(calculation.calculatedAt),
+    },
+  });
+  await db.update(cosmicProfiles).set({
+    calculationStatus: "ready",
+    calculationVersion: calculation.providerVersion,
+    calculationData: { provider: calculation.provider, calculatedAt: calculation.calculatedAt },
+  }).where(eq(cosmicProfiles.id, profile.id));
+  const result = await db.select().from(cosmicNatalCharts).where(eq(cosmicNatalCharts.profileId, profile.id)).limit(1);
+  if (!result[0]) throw new Error("Your natal chart could not be saved.");
+  return result[0];
+}
+
+export async function markCosmicNatalCalculationFailed(userId: number) {
+  const profile = await requireOwnedProfile(userId);
+  if (!profile) return;
+  const db = await requireDb();
+  await db.update(cosmicProfiles).set({ calculationStatus: "failed" }).where(eq(cosmicProfiles.id, profile.id));
 }

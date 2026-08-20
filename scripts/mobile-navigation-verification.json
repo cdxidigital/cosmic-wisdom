@@ -1,0 +1,23 @@
+{
+  "requestedViewport": {
+    "width": 375,
+    "height": 812
+  },
+  "emulated": false,
+  "routes": [
+    {
+      "route": "/tarot",
+      "firstUse": true
+    },
+    {
+      "route": "/palmistry",
+      "firstUse": true
+    }
+  ],
+  "measuredViewport": {
+    "width": 750,
+    "height": 1481
+  },
+  "tarotDrawActivated": true,
+  "palmFallbackActivated": true
+}

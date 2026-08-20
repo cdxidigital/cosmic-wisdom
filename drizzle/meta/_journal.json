@@ -15,6 +15,13 @@
       "when": 1787211265662,
       "tag": "0001_regular_gunslinger",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1787227143670,
+      "tag": "0002_tearful_human_robot",
+      "breakpoints": true
     }
   ]
 }

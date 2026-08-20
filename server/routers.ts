@@ -19,18 +19,22 @@ import {
 import {
   createCosmicFileRecord,
   getCosmicFileByUserIdAndId,
+  getCosmicNatalChartByUserId,
   getCosmicProfileByUserId,
   listCosmicDailyBriefs,
   listCosmicFiles,
   listCosmicReadings,
+  markCosmicNatalCalculationFailed,
   saveCosmicDailyBrief,
   saveCosmicProfile,
   saveCosmicReading,
+  saveCosmicNatalChart,
 } from "./db";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { storageGetSignedUrl, storagePut } from "./storage";
+import { calculateNatalChart } from "./natalAstrology";
 
 export const appRouter = router({
   system: systemRouter,
@@ -55,6 +59,17 @@ export const appRouter = router({
     }),
     listReadings: protectedProcedure.query(({ ctx }) => listCosmicReadings(ctx.user.id)),
     saveReading: protectedProcedure.input(cosmicReadingInput).mutation(({ ctx, input }) => saveCosmicReading(ctx.user.id, input)),
+    getNatalChart: protectedProcedure.query(({ ctx }) => getCosmicNatalChartByUserId(ctx.user.id)),
+    calculateNatalChart: protectedProcedure.input(z.object({ consentToCalculate: z.literal(true) })).mutation(async ({ ctx }) => {
+      const profile = await getCosmicProfileByUserId(ctx.user.id);
+      if (!profile) throw new Error("Save your private birth details before calculating a natal chart.");
+      try {
+        return await saveCosmicNatalChart(ctx.user.id, await calculateNatalChart(profile));
+      } catch (error) {
+        await markCosmicNatalCalculationFailed(ctx.user.id);
+        throw error;
+      }
+    }),
     registerStoredFile: protectedProcedure.input(cosmicFileMetadataInput).mutation(({ ctx, input }) => {
       if (!isMemberPrivateStorageKey(input.storageKey, ctx.user.id)) throw new Error("Files can only be registered inside your private Cosmic storage space.");
       return createCosmicFileRecord(ctx.user.id, input);

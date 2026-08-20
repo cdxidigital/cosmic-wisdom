@@ -81,6 +81,29 @@ export const cosmicDailyBriefs = mysqlTable(
   ],
 );
 
+/** A private, source-traceable Western natal calculation for one member profile. */
+export const cosmicNatalCharts = mysqlTable(
+  "cosmicNatalCharts",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+    profileId: int("profileId").notNull().references(() => cosmicProfiles.id, { onDelete: "cascade" }),
+    provider: varchar("provider", { length: 80 }).notNull(),
+    providerVersion: varchar("providerVersion", { length: 80 }).notNull(),
+    calculationStatus: mysqlEnum("calculationStatus", ["ready", "failed"]).default("ready").notNull(),
+    chartData: json("chartData").$type<Record<string, unknown>>().notNull(),
+    readingData: json("readingData").$type<Record<string, unknown>>().notNull(),
+    sourceData: json("sourceData").$type<Record<string, unknown>>().notNull(),
+    calculatedAt: timestamp("calculatedAt").defaultNow().notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  table => [
+    uniqueIndex("cosmicNatalCharts_profileId_unique").on(table.profileId),
+    index("cosmicNatalCharts_userId_idx").on(table.userId),
+  ],
+);
+
 /** Private Tarot and Palmistry reading records. Camera frames are never stored in this table. */
 export const cosmicReadings = mysqlTable(
   "cosmicReadings",
@@ -124,3 +147,4 @@ export type CosmicProfile = typeof cosmicProfiles.$inferSelect;
 export type CosmicDailyBrief = typeof cosmicDailyBriefs.$inferSelect;
 export type CosmicFile = typeof cosmicFiles.$inferSelect;
 export type CosmicReading = typeof cosmicReadings.$inferSelect;
+export type CosmicNatalChart = typeof cosmicNatalCharts.$inferSelect;

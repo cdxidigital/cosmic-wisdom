@@ -10,6 +10,7 @@ import { lazy, Suspense } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import Numerology from "./pages/Numerology";
 
 const TarotStudio = lazy(() => import("./pages/ReadingStudio").then(module => ({ default: module.TarotStudio })));
 const PalmistryStudio = lazy(() => import("./pages/ReadingStudio").then(module => ({ default: module.PalmistryStudio })));
@@ -34,6 +35,7 @@ function Router() {
       <Route path="/tarot/placement" component={TarotPage} />
       <Route path="/tarot" component={TarotPage} />
       <Route path="/palmistry" component={PalmistryPage} />
+      <Route path="/numerology" component={Numerology} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

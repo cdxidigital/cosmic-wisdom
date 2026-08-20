@@ -67,3 +67,22 @@
 - [x] Set the homepage document title to 30–60 characters.
 - [x] Add meaningful alt text to every homepage image.
 - [x] Verify the final homepage metadata quantities, title length, and image alt coverage.
+- [x] Simplify the home dashboard around one private profile and four clear reading paths.
+- [x] Add a profile-ready Numerology path alongside Natal Chart, Tarot, and Palmistry.
+- [x] Replace layered research language with welcoming digital mystic home guidance.
+- [x] Make each reading path show one clear primary action and an accessible empty state.
+- [x] Preserve the private natal calculation consent flow within the simplified profile journey.
+- [x] Verify the simplified home and all four paths across desktop and mobile.
+- [x] Verify Tarot and Palmistry first-use and navigation states from the simplified home on desktop and mobile.
+- [x] Resolve or confirm the stale dev-server import warning before checkpointing the simplified experience.
+- [x] Exercise Tarot and Palmistry navigation directly from the simplified home on desktop and mobile.
+- [x] Confirm first-use states and a single clear primary action for Tarot and Palmistry through live interactions.
+- [x] Exercise the mobile home’s Tarot and Palmistry navigation controls and verify the destination state after each tap.
+- [x] Exercise Palmistry’s first-use primary control or its safe camera-unavailable fallback without retaining personal imagery.
+- [x] Add unit coverage for the profile-powered Numerology calculations.
+- [x] Capture the rendered compact-menu state and mobile Tarot/Palmistry destinations for the final navigation evidence.
+- [x] Add a non-production compact-preview switch for browser-level mobile-menu interaction verification.
+- [ ] Exercise the simplified home’s compact menu inside a real 375px browser window and capture the studio destination states.
+- [x] Run a real 375px Chromium device-emulation test through the production compact menu without the preview override.
+- [x] Remove the temporary compact-preview verification switch after true mobile navigation passes.
+- [ ] Run the compact-menu verification in a non-emulated 375px Chromium window and record the measured viewport.
