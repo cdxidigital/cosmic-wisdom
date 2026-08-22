@@ -56,13 +56,13 @@
 - [x] Make global unauthorized detection resilient to tRPC error-code variations and failed redirects.
 - [x] Decode and validate protected storage keys safely at the proxy boundary.
 - [x] Guard the Tarot placement-route initializer for non-browser execution contexts.
-- [ ] Select and configure a reliable natal-chart calculation source with documented ephemeris inputs.
-- [ ] Add a member-owned natal-chart calculation record with source metadata and recalculation status.
-- [ ] Implement an authenticated natal-chart calculation procedure using saved birth details.
-- [ ] Replace placeholder core signals with real Sun, Moon, Rising, house, and aspect outputs.
-- [ ] Generate a plain-language natal reading grounded in calculated placements and aspect data.
+- [x] Select and configure a reliable natal-chart calculation source with documented ephemeris inputs.
+- [x] Add a member-owned natal-chart calculation record with source metadata and recalculation status.
+- [x] Implement an authenticated natal-chart calculation procedure using saved birth details.
+- [x] Replace placeholder core signals with real Sun, Moon, Rising, house, and aspect outputs.
+- [x] Generate a plain-language natal reading grounded in calculated placements and aspect data.
 - [ ] Add a clear chart-reading dashboard with source details available on demand.
-- [ ] Validate results against known natal-chart reference data and persist only the member’s own reading.
+- [x] Validate results against known natal-chart reference data and persist only the member’s own reading.
 - [x] Add a homepage meta keywords tag containing 3–8 focused astrology keywords.
 - [x] Set the homepage document title to 30–60 characters.
 - [x] Add meaningful alt text to every homepage image.
@@ -86,9 +86,15 @@
 - [x] Run a real 375px Chromium device-emulation test through the production compact menu without the preview override.
 - [x] Remove the temporary compact-preview verification switch after true mobile navigation passes.
 - [ ] Run the compact-menu verification in a non-emulated 375px Chromium window and record the measured viewport.
-- [ ] Restore genuine natal-chart calculation, private member persistence, and source-grounded chart dashboard from the recovered baseline.
+- [x] Restore genuine natal-chart calculation, private member persistence, and source-grounded chart dashboard from the recovered baseline.
 - [ ] Restore deeper natal interpretation with element balance, house focus, aspects, and practical prompts.
-- [ ] Restore the private consent-based Compatibility route with communication, emotional, attraction, and friction lenses.
+- [x] Restore the private consent-based Compatibility route with communication, emotional, attraction, and friction lenses.
 - [ ] Restore optional healthy daily reflection check-ins without streak or pressure mechanics.
-- [ ] Restore the Palmistry structured camera-denied recovery card with no-camera and retry controls.
+- [x] Restore the Palmistry structured camera-denied recovery card with no-camera and retry controls.
 - [ ] Revalidate the recovered expansion across desktop, mobile, permissions, privacy, and all application checks.
+- [x] Gate Compatibility behind an authenticated natal profile and an explicit consent acknowledgement.
+- [ ] Verify the recovered Compatibility entry point from home on desktop and mobile.
+- [ ] Run a recorded full recovered-release validation pass across home navigation, Compatibility, Palmistry denial fallback, responsive rendering, tests, and production build.
+- [ ] Add a natal source-details disclosure and verify its on-demand metadata rendering.
+- [ ] Implement and surface calculated house-focus interpretation with test coverage.
+- [ ] Exercise Compatibility through the real mobile home menu and record the destination state.

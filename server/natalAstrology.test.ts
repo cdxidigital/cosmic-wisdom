@@ -6,8 +6,8 @@ describe("natal response normalisation", () => {
     const calculation = normaliseNatalResponse({
       planets: [
         { name: "Sun", sign: "Taurus", pos: 24.5, house: 9, retrograde: false },
-        { name: "Moon", sign: "Cancer", pos: 3.25, house: 11, retrograde: false },
-        { name: "Mars", sign: "Gemini", pos: 8.75, house: 10, retrograde: false },
+        { name: "Moon", sign: "Cancer", pos: 3.25, house: 9, retrograde: false },
+        { name: "Mars", sign: "Gemini", pos: 8.75, house: 9, retrograde: false },
       ],
       angles_details: { asc: { name: "Ascendant", sign: "Leo", pos: 12.5, house: 1 } },
       houses: [{ house: 1, sign: "Leo", pos: 12.5 }],
@@ -22,6 +22,8 @@ describe("natal response normalisation", () => {
       aspects: [{ first: "Sun", second: "Moon", type: "sextile" }],
     });
     expect(calculation.readingData.title).toContain("Taurus Sun");
+    const sections = calculation.readingData.sections as Array<{ label?: string; placement?: string }>;
+    expect(sections).toContainEqual(expect.objectContaining({ label: "House focus", placement: "House 9 emphasis" }));
     expect(calculation.sourceData.provider).toBe("FreeAstroAPI");
   });
 

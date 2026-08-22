@@ -134,6 +134,12 @@ export function normaliseNatalResponse(payload: unknown): NatalCalculation {
     return balance;
   }, {});
   const leadingElement = Object.entries(elementBalance).sort(([, a], [, b]) => b - a)[0]?.[0] ?? "Air";
+  const houseBalance = planets.map(point => toPlacement(point, "Planet")).filter(point => point.house !== null).reduce<Record<string, number>>((balance, point) => {
+    const house = String(point.house);
+    balance[house] = (balance[house] ?? 0) + 1;
+    return balance;
+  }, {});
+  const focusHouse = Object.entries(houseBalance).sort(([, a], [, b]) => b - a)[0]?.[0] ?? null;
 
   return {
     provider: PROVIDER,
@@ -155,6 +161,7 @@ export function normaliseNatalResponse(payload: unknown): NatalCalculation {
         { label: "Inner weather", placement: moon.formatted, interpretation: `Your Moon in ${moon.sign} describes a ${moonFocus}. Notice it when you need to understand what restores your equilibrium.` },
         { label: "First impression", placement: rising.formatted, interpretation: `Your Rising sign is ${rising.sign}, suggesting a ${risingFocus} when you meet a new setting or threshold.` },
         { label: "Element balance", placement: `${leadingElement} emphasis`, interpretation: `Your calculated placements lean toward ${leadingElement.toLowerCase()} themes. Let this be a practical lens for where you may seek movement, grounding, connection, or restoration.` },
+        ...(focusHouse ? [{ label: "House focus", placement: `House ${focusHouse} emphasis`, interpretation: `Several calculated placements gather in your ${focusHouse}${focusHouse === "1" ? "st" : focusHouse === "2" ? "nd" : focusHouse === "3" ? "rd" : "th"} house. Treat this as an area of life that may reward ongoing attention and conscious choice.` }] : []),
         ...aspects.slice(0, 3).map(aspect => ({ label: "Key aspect", placement: `${aspect.first} ${aspect.type} ${aspect.second}`, interpretation: `This calculated aspect is an invitation to notice how these parts of your chart cooperate or ask for conscious integration.` })),
       ],
       practicalFocus: `For one week, notice where your ${sun.sign} Sun leads, your ${moon.sign} Moon needs care, and your ${rising.sign} Rising shapes your first move.`,
