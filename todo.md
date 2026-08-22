@@ -61,7 +61,7 @@
 - [x] Implement an authenticated natal-chart calculation procedure using saved birth details.
 - [x] Replace placeholder core signals with real Sun, Moon, Rising, house, and aspect outputs.
 - [x] Generate a plain-language natal reading grounded in calculated placements and aspect data.
-- [ ] Add a clear chart-reading dashboard with source details available on demand.
+- [x] Add a clear chart-reading dashboard with source details available on demand.
 - [x] Validate results against known natal-chart reference data and persist only the member’s own reading.
 - [x] Add a homepage meta keywords tag containing 3–8 focused astrology keywords.
 - [x] Set the homepage document title to 30–60 characters.
@@ -89,14 +89,14 @@
 - [x] Restore genuine natal-chart calculation, private member persistence, and source-grounded chart dashboard from the recovered baseline.
 - [x] Restore deeper natal interpretation with element balance, house focus, aspects, and practical prompts.
 - [x] Restore the private consent-based Compatibility route with communication, emotional, attraction, and friction lenses.
-- [ ] Restore optional healthy daily reflection check-ins without streak or pressure mechanics.
+- [x] Restore optional healthy daily reflection check-ins without streak or pressure mechanics.
 - [x] Restore the Palmistry structured camera-denied recovery card with no-camera and retry controls.
 - [ ] Revalidate the recovered expansion across desktop, mobile, permissions, privacy, and all application checks.
 - [x] Gate Compatibility behind an authenticated natal profile and an explicit consent acknowledgement.
 - [ ] Verify the recovered Compatibility entry point from home on desktop and mobile.
 - [ ] Run a recorded full recovered-release validation pass across home navigation, Compatibility, Palmistry denial fallback, responsive rendering, tests, and production build.
-- [ ] Add a natal source-details disclosure and verify its on-demand metadata rendering.
+- [x] Add a natal source-details disclosure and verify its on-demand metadata rendering.
 - [x] Implement and surface calculated house-focus interpretation with test coverage.
 - [ ] Exercise Compatibility through the real mobile home menu and record the destination state.
-- [ ] Link the Home natal experience to the private on-demand chart details screen.
+- [x] Link the Home natal experience to the private on-demand chart details screen.
 - [ ] Open and expand the natal calculation-notes disclosure in the browser at desktop and mobile layouts.

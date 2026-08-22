@@ -14,6 +14,7 @@ import Numerology from "./pages/Numerology";
 import PalmistryBeta from "./pages/PalmistryBeta";
 import Compatibility from "./pages/Compatibility";
 import NatalDetails from "./pages/NatalDetails";
+import DailyRitualPage from "./pages/DailyRitualPage";
 
 const TarotStudio = lazy(() => import("./pages/ReadingStudio").then(module => ({ default: module.TarotStudio })));
 const PalmistryStudio = lazy(() => import("./pages/ReadingStudio").then(module => ({ default: module.PalmistryStudio })));
@@ -41,6 +42,7 @@ function Router() {
       <Route path="/numerology" component={Numerology} />
       <Route path="/compatibility" component={Compatibility} />
       <Route path="/natal-details" component={NatalDetails} />
+      <Route path="/daily-ritual" component={DailyRitualPage} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
@@ -50,7 +52,7 @@ function Router() {
 function ChartDetailsShortcut() {
   const [location] = useLocation();
   if (location !== "/") return null;
-  return <a href="/natal-details" className="fixed bottom-4 left-4 z-30 border border-[#102936]/15 bg-[#F3F0E9]/95 px-3 py-2 font-mono text-[8px] tracking-[.13em] text-[#55707d] shadow-sm transition-colors hover:border-[#B63C5E] hover:text-[#B63C5E]">CHART DETAILS ↗</a>;
+  return <div className="fixed bottom-4 left-4 z-30 flex gap-2"><a href="/natal-details" className="border border-[#102936]/15 bg-[#F3F0E9]/95 px-3 py-2 font-mono text-[8px] tracking-[.13em] text-[#55707d] shadow-sm transition-colors hover:border-[#B63C5E] hover:text-[#B63C5E]">CHART DETAILS ↗</a><a href="/daily-ritual" className="border border-[#102936]/15 bg-[#F3F0E9]/95 px-3 py-2 font-mono text-[8px] tracking-[.13em] text-[#55707d] shadow-sm transition-colors hover:border-[#B63C5E] hover:text-[#B63C5E]">DAILY RITUAL ↗</a></div>;
 }
 
 function App() {
