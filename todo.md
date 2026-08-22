@@ -87,7 +87,7 @@
 - [x] Remove the temporary compact-preview verification switch after true mobile navigation passes.
 - [ ] Run the compact-menu verification in a non-emulated 375px Chromium window and record the measured viewport.
 - [x] Restore genuine natal-chart calculation, private member persistence, and source-grounded chart dashboard from the recovered baseline.
-- [ ] Restore deeper natal interpretation with element balance, house focus, aspects, and practical prompts.
+- [x] Restore deeper natal interpretation with element balance, house focus, aspects, and practical prompts.
 - [x] Restore the private consent-based Compatibility route with communication, emotional, attraction, and friction lenses.
 - [ ] Restore optional healthy daily reflection check-ins without streak or pressure mechanics.
 - [x] Restore the Palmistry structured camera-denied recovery card with no-camera and retry controls.
@@ -96,5 +96,7 @@
 - [ ] Verify the recovered Compatibility entry point from home on desktop and mobile.
 - [ ] Run a recorded full recovered-release validation pass across home navigation, Compatibility, Palmistry denial fallback, responsive rendering, tests, and production build.
 - [ ] Add a natal source-details disclosure and verify its on-demand metadata rendering.
-- [ ] Implement and surface calculated house-focus interpretation with test coverage.
+- [x] Implement and surface calculated house-focus interpretation with test coverage.
 - [ ] Exercise Compatibility through the real mobile home menu and record the destination state.
+- [ ] Link the Home natal experience to the private on-demand chart details screen.
+- [ ] Open and expand the natal calculation-notes disclosure in the browser at desktop and mobile layouts.
