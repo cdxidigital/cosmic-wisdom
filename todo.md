@@ -86,3 +86,9 @@
 - [x] Run a real 375px Chromium device-emulation test through the production compact menu without the preview override.
 - [x] Remove the temporary compact-preview verification switch after true mobile navigation passes.
 - [ ] Run the compact-menu verification in a non-emulated 375px Chromium window and record the measured viewport.
+- [ ] Restore genuine natal-chart calculation, private member persistence, and source-grounded chart dashboard from the recovered baseline.
+- [ ] Restore deeper natal interpretation with element balance, house focus, aspects, and practical prompts.
+- [ ] Restore the private consent-based Compatibility route with communication, emotional, attraction, and friction lenses.
+- [ ] Restore optional healthy daily reflection check-ins without streak or pressure mechanics.
+- [ ] Restore the Palmistry structured camera-denied recovery card with no-camera and retry controls.
+- [ ] Revalidate the recovered expansion across desktop, mobile, permissions, privacy, and all application checks.

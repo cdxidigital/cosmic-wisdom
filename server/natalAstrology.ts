@@ -64,6 +64,9 @@ const signFocus: Record<string, string> = {
   Pisces: "imaginative, intuitive approach",
 };
 
+const signCodes: Record<string, string> = { Ari: "Aries", Tau: "Taurus", Gem: "Gemini", Can: "Cancer", Leo: "Leo", Vir: "Virgo", Lib: "Libra", Sco: "Scorpio", Sag: "Sagittarius", Cap: "Capricorn", Aqu: "Aquarius", Pis: "Pisces" };
+const signElements: Record<string, string> = { Aries: "Fire", Leo: "Fire", Sagittarius: "Fire", Taurus: "Earth", Virgo: "Earth", Capricorn: "Earth", Gemini: "Air", Libra: "Air", Aquarius: "Air", Cancer: "Water", Scorpio: "Water", Pisces: "Water" };
+
 function asText(value: unknown, fallback: string) {
   return typeof value === "string" && value.trim() ? value.trim() : fallback;
 }
@@ -83,7 +86,8 @@ function toPlacement(value: ProviderPoint, fallbackName: string): NatalPlacement
   const degree = asFiniteNumber(value.pos);
   if (degree === null) throw new Error(`The natal provider did not return a valid position for ${fallbackName}.`);
   const name = asText(value.name, fallbackName);
-  const sign = asText(value.sign, "Unknown sign");
+  const rawSign = asText(value.sign, "Unknown sign");
+  const sign = signCodes[rawSign] ?? rawSign;
   return {
     name,
     sign,
@@ -124,6 +128,12 @@ export function normaliseNatalResponse(payload: unknown): NatalCalculation {
   const sunFocus = signFocus[sun.sign] ?? "self-directed approach";
   const moonFocus = signFocus[moon.sign] ?? "inner response pattern";
   const risingFocus = signFocus[rising.sign] ?? "outer style";
+  const elementBalance = planets.reduce<Record<string, number>>((balance, point) => {
+    const element = signElements[signCodes[asText(point.sign, "")] ?? asText(point.sign, "")] ?? "Air";
+    balance[element] = (balance[element] ?? 0) + 1;
+    return balance;
+  }, {});
+  const leadingElement = Object.entries(elementBalance).sort(([, a], [, b]) => b - a)[0]?.[0] ?? "Air";
 
   return {
     provider: PROVIDER,
@@ -144,6 +154,8 @@ export function normaliseNatalResponse(payload: unknown): NatalCalculation {
         { label: "Core direction", placement: sun.formatted, interpretation: `Your Sun in ${sun.sign} points to a ${sunFocus}. Use it as the part of the chart that describes what feels most like a conscious direction of growth.` },
         { label: "Inner weather", placement: moon.formatted, interpretation: `Your Moon in ${moon.sign} describes a ${moonFocus}. Notice it when you need to understand what restores your equilibrium.` },
         { label: "First impression", placement: rising.formatted, interpretation: `Your Rising sign is ${rising.sign}, suggesting a ${risingFocus} when you meet a new setting or threshold.` },
+        { label: "Element balance", placement: `${leadingElement} emphasis`, interpretation: `Your calculated placements lean toward ${leadingElement.toLowerCase()} themes. Let this be a practical lens for where you may seek movement, grounding, connection, or restoration.` },
+        ...aspects.slice(0, 3).map(aspect => ({ label: "Key aspect", placement: `${aspect.first} ${aspect.type} ${aspect.second}`, interpretation: `This calculated aspect is an invitation to notice how these parts of your chart cooperate or ask for conscious integration.` })),
       ],
       practicalFocus: `For one week, notice where your ${sun.sign} Sun leads, your ${moon.sign} Moon needs care, and your ${rising.sign} Rising shapes your first move.`,
     },

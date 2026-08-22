@@ -11,6 +11,8 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Numerology from "./pages/Numerology";
+import PalmistryBeta from "./pages/PalmistryBeta";
+import Compatibility from "./pages/Compatibility";
 
 const TarotStudio = lazy(() => import("./pages/ReadingStudio").then(module => ({ default: module.TarotStudio })));
 const PalmistryStudio = lazy(() => import("./pages/ReadingStudio").then(module => ({ default: module.PalmistryStudio })));
@@ -24,7 +26,7 @@ function TarotPage() {
 }
 
 function PalmistryPage() {
-  return <Suspense fallback={<StudioLoading />}><PalmistryStudio /></Suspense>;
+  return <PalmistryBeta />;
 }
 
 function Router() {
@@ -36,6 +38,7 @@ function Router() {
       <Route path="/tarot" component={TarotPage} />
       <Route path="/palmistry" component={PalmistryPage} />
       <Route path="/numerology" component={Numerology} />
+      <Route path="/compatibility" component={Compatibility} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
