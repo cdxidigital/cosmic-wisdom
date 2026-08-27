@@ -132,3 +132,14 @@
 - [x] Align the revised Tarot save payload with the validated private-reading consent contract and restore a clean type check.
 - [x] Correct the Tarot shuffle-test fixture so it exercises a non-identity Fisher–Yates permutation deterministically.
 - [x] Exercise three unique no-save Tarot draws and New Shuffle at an exact 375px mobile viewport, recording the reserve count and synthesis result.
+- [x] Map the existing natal placements, aspects, elements, and house focus into a deeper pattern-led reading structure.
+- [x] Add a private on-demand daily teaching derived from the member’s saved natal pattern and the calendar date, without a scheduled background job.
+- [x] Surface clear reflective practices and deeper interpretation through the natal details and daily ritual experiences.
+- [x] Add automated coverage for deterministic daily teaching selection, pattern interpretation boundaries, and missing-profile/chart states.
+- [x] Validate desktop and mobile in-depth astrology and daily-teaching flows without exposing private birth data in public content.
+- [x] Resolve the natal-teaching helper’s TypeScript target compatibility error and restore a clean type check.
+- [x] Add UI tests for authenticated chart-present, authenticated chart-missing, and unauthenticated natal-details and daily-teaching states.
+- [x] Exercise the natal-details-to-daily-teaching path and browser-only acknowledgement at an exact 375px mobile viewport.
+- [x] Audit the public homepage and unauthenticated private routes to confirm no enriched content reveals raw birth date, time, or location.
+- [x] Restore server-rendered natal component test compatibility by adding the required React imports for the current JSX configuration.
+- [x] Correct the natal privacy test to distinguish method-note labels from actual raw birth-value disclosure.

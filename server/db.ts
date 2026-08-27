@@ -3,6 +3,7 @@
  * and stored-file references are never queried without the authenticated owner ID.
  */
 import { and, desc, eq } from "drizzle-orm";
+import { randomUUID } from "node:crypto";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   cosmicDailyBriefs,
@@ -86,6 +87,28 @@ export async function getUserByOpenId(openId: string) {
   if (!db) return undefined;
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
   return result[0];
+}
+
+export async function getUserByEmail(email: string) {
+  const db = await requireDb();
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  return result[0] ?? null;
+}
+
+export async function createLocalUser(input: { email: string; displayName: string; passwordHash: string }) {
+  const db = await requireDb();
+  const openId = `local_${randomUUID().replaceAll("-", "")}`;
+  await db.insert(users).values({
+    openId,
+    name: input.displayName,
+    email: input.email,
+    passwordHash: input.passwordHash,
+    loginMethod: "email_password",
+    lastSignedIn: new Date(),
+  });
+  const user = await getUserByOpenId(openId);
+  if (!user) throw new Error("Your account could not be created.");
+  return user;
 }
 
 export async function getCosmicProfileByUserId(userId: number): Promise<CosmicProfile | null> {
