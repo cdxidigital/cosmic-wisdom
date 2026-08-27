@@ -118,3 +118,17 @@
 - [x] Validate the live 375px home-menu Compatibility navigation and destination state in an independent browser session.
 - [x] Re-exercise Palmistry camera-unavailable or permission-denied recovery during the final validation pass without retaining imagery.
 - [x] Revalidate and strengthen homepage SEO scanner detection for the required title, description, keyword tag, and descriptive H2 within the strict limits.
+- [ ] Define and migrate a password-hash field for local email accounts without weakening existing OAuth identities.
+- [ ] Add authenticated registration and sign-in procedures with email normalization, strong password validation, hashing, and rate-safe generic failures.
+- [ ] Issue and clear secure local-account sessions compatible with the existing private member context.
+- [ ] Add an accessible email-and-password register/sign-in interface alongside the current member flow.
+- [ ] Add automated tests for password rules, duplicate-email handling, bad credentials, session issuance, logout, and member isolation.
+- [ ] Validate registration, sign-in, sign-out, and private-profile gating in desktop and mobile browser flows.
+- [x] Diagnose the repeated Tarot draw behaviour and confirm the deck source is complete enough for three-card readings.
+- [x] Implement a secure Fisher–Yates shuffle with an in-session draw pile so a card cannot repeat within a spread.
+- [x] Add a clear three-card reading synthesis that combines Context, Threshold, and Orientation after all cards are drawn.
+- [x] Add deterministic unit tests for deck shuffle integrity, non-repeating draws, reset behaviour, and reading synthesis.
+- [x] Validate multi-draw, reset, and newly shuffled Tarot spreads in desktop and mobile browser flows without saving test readings.
+- [x] Align the revised Tarot save payload with the validated private-reading consent contract and restore a clean type check.
+- [x] Correct the Tarot shuffle-test fixture so it exercises a non-identity Fisher–Yates permutation deterministically.
+- [x] Exercise three unique no-save Tarot draws and New Shuffle at an exact 375px mobile viewport, recording the reserve count and synthesis result.
