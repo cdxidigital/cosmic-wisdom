@@ -184,3 +184,15 @@
 - [x] Stabilize the timed-out external natal credential regression so a transient upstream delay cannot block the full audit suite.
 - [x] Confirm signed-out Account Settings reaches local Account entry after its normal auth-loading transition rather than an indefinite loading state.
 - [x] Reduce the oversized initial production bundle by lazy-loading non-home Cosmic routes while preserving loading and navigation states.
+- [x] Add member-scoped saved-content bookmarks for supported cosmic reading surfaces, with no cross-member visibility.
+- [x] Add a persistent, accessible dark-mode toggle in the shared navigation and honour system/reduced-motion preferences.
+- [x] Add an on-demand deterministic daily homepage quote that changes by local calendar date without scheduled background work.
+- [x] Add responsive bookmark and saved-content controls with clear empty, save, remove, and sign-in states.
+- [x] Add automated coverage for bookmark isolation and toggling, theme persistence, date-driven quote selection, and unauthenticated states.
+- [x] Validate desktop and mobile bookmarks, dark mode, and daily quote flows without exposing private member data.
+- [x] Complete the interrupted bookmark schema and database-helper patch, restoring the protected router exports and a clean type check.
+- [x] Ensure the date-driven homepage quote advances consistently across consecutive local calendar dates, including digit-boundary changes.
+- [x] Restore the homepage missing-profile test by supplying the required theme context for the new navigation toggle.
+- [x] Restore server-rendered route tests by adding the required React import to the new theme toggle component.
+- [x] Restore the homepage test’s saved-content tRPC mock so the new bookmark controls render in the existing missing-profile test harness.
+- [x] Restore server-rendered homepage tests by adding the required React import to the new saved-content bookmark control.

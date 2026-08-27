@@ -10,6 +10,7 @@ import {
   cosmicFileMetadataInput,
   cosmicProfileAssetUploadInput,
   cosmicProfileInput,
+  cosmicSavedItemInput,
   cosmicPrivateStoragePrefix,
   cosmicReadingInput,
   cosmicTextReportInput,
@@ -27,12 +28,14 @@ import {
   listCosmicDailyBriefs,
   listCosmicFiles,
   listCosmicReadings,
+  listCosmicSavedItems,
   markCosmicNatalCalculationFailed,
   saveCosmicDailyBrief,
   saveCosmicProfile,
   saveCosmicReading,
   saveCosmicNatalChart,
   touchUserLastSignedIn,
+  toggleCosmicSavedItem,
   updateUserPasswordHash,
 } from "./db";
 import { getSessionCookieOptions } from "./_core/cookies";
@@ -155,6 +158,8 @@ export const appRouter = router({
     }),
     listReadings: protectedProcedure.query(({ ctx }) => listCosmicReadings(ctx.user.id)),
     saveReading: protectedProcedure.input(cosmicReadingInput).mutation(({ ctx, input }) => saveCosmicReading(ctx.user.id, input)),
+    listSavedItems: protectedProcedure.query(({ ctx }) => listCosmicSavedItems(ctx.user.id)),
+    toggleSavedItem: protectedProcedure.input(cosmicSavedItemInput).mutation(({ ctx, input }) => toggleCosmicSavedItem(ctx.user.id, input)),
     getNatalChart: protectedProcedure.query(({ ctx }) => getCosmicNatalChartByUserId(ctx.user.id)),
     calculateNatalChart: protectedProcedure.input(z.object({ consentToCalculate: z.literal(true) })).mutation(async ({ ctx }) => {
       const profile = await getCosmicProfileByUserId(ctx.user.id);

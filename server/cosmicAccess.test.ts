@@ -8,9 +8,11 @@ const dbMocks = vi.hoisted(() => ({
   listCosmicDailyBriefs: vi.fn(),
   listCosmicFiles: vi.fn(),
   listCosmicReadings: vi.fn(),
+  listCosmicSavedItems: vi.fn(),
   saveCosmicDailyBrief: vi.fn(),
   saveCosmicProfile: vi.fn(),
   saveCosmicReading: vi.fn(),
+  toggleCosmicSavedItem: vi.fn(),
 }));
 
 const storageMocks = vi.hoisted(() => ({
@@ -96,6 +98,24 @@ describe("Cosmic member data isolation", () => {
     expect(dbMocks.saveCosmicReading).toHaveBeenCalledWith(42, reading);
   });
 
+  it("scopes saved content lists and toggles to the authenticated member", async () => {
+    dbMocks.listCosmicSavedItems.mockResolvedValue([]);
+    dbMocks.toggleCosmicSavedItem.mockResolvedValue({ saved: true });
+    const caller = appRouter.createCaller(context(member));
+    const savedItem = {
+      contentKey: "lens:tarot",
+      contentType: "tarot" as const,
+      title: "Tarot",
+      summary: "A clear three-card spread when you want a different question.",
+      href: "/tarot",
+    };
+
+    await expect(caller.cosmic.listSavedItems()).resolves.toEqual([]);
+    await expect(caller.cosmic.toggleSavedItem(savedItem)).resolves.toEqual({ saved: true });
+    expect(dbMocks.listCosmicSavedItems).toHaveBeenCalledWith(42);
+    expect(dbMocks.toggleCosmicSavedItem).toHaveBeenCalledWith(42, savedItem);
+  });
+
   it("creates a report only in the authenticated member namespace", async () => {
     dbMocks.getCosmicProfileByUserId.mockResolvedValue({ id: 4 });
     storageMocks.storagePut.mockResolvedValue({
@@ -139,6 +159,7 @@ describe("Cosmic member data isolation", () => {
 
     await expect(caller.cosmic.getMyProfile()).rejects.toMatchObject({ code: "UNAUTHORIZED" });
     await expect(caller.cosmic.getFileDownloadUrl({ fileId: 7 })).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+    await expect(caller.cosmic.listSavedItems()).rejects.toMatchObject({ code: "UNAUTHORIZED" });
     expect(dbMocks.getCosmicProfileByUserId).not.toHaveBeenCalled();
     expect(dbMocks.getCosmicFileByUserIdAndId).not.toHaveBeenCalled();
   });

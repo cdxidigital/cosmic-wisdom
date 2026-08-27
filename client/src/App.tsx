@@ -19,6 +19,7 @@ const DailyRitualPage = lazy(() => import("./pages/DailyRitualPage"));
 const NatalDetails = lazy(() => import("./pages/NatalDetails"));
 const Numerology = lazy(() => import("./pages/Numerology"));
 const PalmistryBeta = lazy(() => import("./pages/PalmistryBeta"));
+const SavedItems = lazy(() => import("./pages/SavedItems"));
 
 function StudioLoading() {
   return <main className="flex min-h-screen items-center justify-center bg-[#F3F0E9] text-[#102936]"><p className="font-mono text-[10px] font-semibold tracking-[.16em]">OPENING COSMIC STUDIO…</p></main>;
@@ -41,6 +42,7 @@ const DailyRitual = loadPage(DailyRitualPage);
 const NatalDetailsPage = loadPage(NatalDetails);
 const NumerologyPage = loadPage(Numerology);
 const PalmistryPage = loadPage(PalmistryBeta);
+const SavedItemsPage = loadPage(SavedItems);
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -56,6 +58,7 @@ function Router() {
       <Route path="/compatibility" component={CompatibilityPage} />
       <Route path="/natal-details" component={NatalDetailsPage} />
       <Route path="/daily-ritual" component={DailyRitual} />
+      <Route path="/saved" component={SavedItemsPage} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
@@ -71,7 +74,7 @@ function ChartDetailsShortcut() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="light">
+        <ThemeProvider defaultTheme="light" switchable>
         <TooltipProvider>
           <Toaster theme="light" richColors position="bottom-right" />
           <Router />

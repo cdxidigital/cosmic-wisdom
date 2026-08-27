@@ -11,14 +11,16 @@ import {
   cosmicNatalCharts,
   cosmicProfiles,
   cosmicReadings,
+  cosmicSavedItems,
   CosmicFile,
   CosmicNatalChart,
   CosmicProfile,
   CosmicReading,
+  CosmicSavedItem,
   InsertUser,
   users,
 } from "../drizzle/schema";
-import type { CosmicBriefInput, CosmicFileMetadataInput, CosmicProfileInput, CosmicReadingInput } from "./cosmicSchemas";
+import type { CosmicBriefInput, CosmicFileMetadataInput, CosmicProfileInput, CosmicReadingInput, CosmicSavedItemInput } from "./cosmicSchemas";
 import type { NatalCalculation } from "./natalAstrology";
 import { ENV } from "./_core/env";
 
@@ -269,6 +271,23 @@ export async function saveCosmicReading(userId: number, input: CosmicReadingInpu
 export async function listCosmicReadings(userId: number) {
   const db = await requireDb();
   return db.select().from(cosmicReadings).where(eq(cosmicReadings.userId, userId)).orderBy(desc(cosmicReadings.createdAt)).limit(24);
+}
+
+export async function listCosmicSavedItems(userId: number): Promise<CosmicSavedItem[]> {
+  const db = await requireDb();
+  return db.select().from(cosmicSavedItems).where(eq(cosmicSavedItems.userId, userId)).orderBy(desc(cosmicSavedItems.createdAt)).limit(40);
+}
+
+export async function toggleCosmicSavedItem(userId: number, input: CosmicSavedItemInput) {
+  const db = await requireDb();
+  const existing = await db.select({ id: cosmicSavedItems.id }).from(cosmicSavedItems)
+    .where(and(eq(cosmicSavedItems.userId, userId), eq(cosmicSavedItems.contentKey, input.contentKey))).limit(1);
+  if (existing[0]) {
+    await db.delete(cosmicSavedItems).where(and(eq(cosmicSavedItems.userId, userId), eq(cosmicSavedItems.id, existing[0].id)));
+    return { saved: false } as const;
+  }
+  await db.insert(cosmicSavedItems).values({ userId, ...input });
+  return { saved: true } as const;
 }
 
 export async function getCosmicNatalChartByUserId(userId: number): Promise<CosmicNatalChart | null> {

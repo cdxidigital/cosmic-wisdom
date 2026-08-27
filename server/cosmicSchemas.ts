@@ -55,6 +55,16 @@ export const cosmicReadingInput = z.object({
   consentVersion: z.literal("camera-guidance-v1"),
 });
 
+const savedContentTypes = ["natal", "numerology", "tarot", "palmistry", "compatibility", "daily_quote"] as const;
+
+export const cosmicSavedItemInput = z.object({
+  contentKey: z.string().trim().regex(/^[a-z0-9:_-]+$/, "Use a valid saved-content key.").max(120),
+  contentType: z.enum(savedContentTypes),
+  title: z.string().trim().min(2).max(180),
+  summary: z.string().trim().min(2).max(500),
+  href: z.string().regex(/^\/(?:[a-z0-9/-]+)?$/, "Use an internal Cosmic link.").max(256),
+});
+
 export const safeReportFileName = (value: string) => {
   const normalized = value
     .toLowerCase()
@@ -77,3 +87,4 @@ export type CosmicBriefInput = z.infer<typeof cosmicBriefInput>;
 export type CosmicFileMetadataInput = z.infer<typeof cosmicFileMetadataInput>;
 export type CosmicProfileAssetUploadInput = z.infer<typeof cosmicProfileAssetUploadInput>;
 export type CosmicReadingInput = z.infer<typeof cosmicReadingInput>;
+export type CosmicSavedItemInput = z.infer<typeof cosmicSavedItemInput>;

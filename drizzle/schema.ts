@@ -130,6 +130,25 @@ export const cosmicReadings = mysqlTable(
   table => [index("cosmicReadings_userId_idx").on(table.userId), index("cosmicReadings_profileId_idx").on(table.profileId)],
 );
 
+/** Member-owned shortcuts to Cosmic Wisdom surfaces. Content is referenced by safe summary metadata only. */
+export const cosmicSavedItems = mysqlTable(
+  "cosmicSavedItems",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+    contentKey: varchar("contentKey", { length: 120 }).notNull(),
+    contentType: mysqlEnum("contentType", ["natal", "numerology", "tarot", "palmistry", "compatibility", "daily_quote"]).notNull(),
+    title: varchar("title", { length: 180 }).notNull(),
+    summary: varchar("summary", { length: 500 }).notNull(),
+    href: varchar("href", { length: 256 }).notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  table => [
+    uniqueIndex("cosmicSavedItems_userId_contentKey_unique").on(table.userId, table.contentKey),
+    index("cosmicSavedItems_userId_idx").on(table.userId),
+  ],
+);
+
 /** Metadata for member files. The actual bytes remain in the S3 storage layer. */
 export const cosmicFiles = mysqlTable(
   "cosmicFiles",
@@ -155,3 +174,4 @@ export type CosmicDailyBrief = typeof cosmicDailyBriefs.$inferSelect;
 export type CosmicFile = typeof cosmicFiles.$inferSelect;
 export type CosmicReading = typeof cosmicReadings.$inferSelect;
 export type CosmicNatalChart = typeof cosmicNatalCharts.$inferSelect;
+export type CosmicSavedItem = typeof cosmicSavedItems.$inferSelect;
