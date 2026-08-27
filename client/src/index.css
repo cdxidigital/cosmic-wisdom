@@ -7,6 +7,9 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant midnight (&:is(.theme-midnight *));
+@custom-variant forest (&:is(.theme-forest *));
+@custom-variant royal (&:is(.theme-royal *));
 
 @theme inline {
   --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
@@ -57,6 +60,63 @@
   --border: oklch(0.28 0.04 312 / 15%);
   --input: oklch(0.28 0.04 312 / 15%);
   --ring: oklch(0.51 0.16 10);
+}
+
+.theme-midnight, .dark {
+  --background: oklch(0.14 0.02 280);
+  --foreground: oklch(0.95 0.018 76);
+  --card: oklch(0.18 0.03 280);
+  --card-foreground: oklch(0.95 0.018 76);
+  --popover: oklch(0.18 0.03 280);
+  --popover-foreground: oklch(0.95 0.018 76);
+  --primary: oklch(0.95 0.018 76);
+  --primary-foreground: oklch(0.14 0.02 280);
+  --secondary: oklch(0.25 0.04 280);
+  --secondary-foreground: oklch(0.95 0.018 76);
+  --muted: oklch(0.22 0.03 280);
+  --muted-foreground: oklch(0.7 0.03 280);
+  --accent: oklch(0.6 0.15 320);
+  --accent-foreground: oklch(0.95 0.018 76);
+  --border: oklch(0.95 0.018 76 / 15%);
+  --input: oklch(0.95 0.018 76 / 15%);
+}
+
+.theme-forest {
+  --background: oklch(0.18 0.03 150);
+  --foreground: oklch(0.92 0.04 150);
+  --card: oklch(0.22 0.04 150);
+  --card-foreground: oklch(0.92 0.04 150);
+  --popover: oklch(0.22 0.04 150);
+  --popover-foreground: oklch(0.92 0.04 150);
+  --primary: oklch(0.85 0.1 150);
+  --primary-foreground: oklch(0.18 0.03 150);
+  --secondary: oklch(0.28 0.05 150);
+  --secondary-foreground: oklch(0.92 0.04 150);
+  --muted: oklch(0.25 0.04 150);
+  --muted-foreground: oklch(0.65 0.05 150);
+  --accent: oklch(0.7 0.15 80);
+  --accent-foreground: oklch(0.18 0.03 150);
+  --border: oklch(0.92 0.04 150 / 15%);
+  --input: oklch(0.92 0.04 150 / 15%);
+}
+
+.theme-royal {
+  --background: oklch(0.16 0.05 300);
+  --foreground: oklch(0.94 0.03 300);
+  --card: oklch(0.2 0.06 300);
+  --card-foreground: oklch(0.94 0.03 300);
+  --popover: oklch(0.2 0.06 300);
+  --popover-foreground: oklch(0.94 0.03 300);
+  --primary: oklch(0.88 0.08 300);
+  --primary-foreground: oklch(0.16 0.05 300);
+  --secondary: oklch(0.26 0.07 300);
+  --secondary-foreground: oklch(0.94 0.03 300);
+  --muted: oklch(0.23 0.06 300);
+  --muted-foreground: oklch(0.75 0.05 300);
+  --accent: oklch(0.7 0.18 45);
+  --accent-foreground: oklch(0.16 0.05 300);
+  --border: oklch(0.94 0.03 300 / 15%);
+  --input: oklch(0.94 0.03 300 / 15%);
 }
 
 * { border-color: var(--border); }
@@ -111,16 +171,50 @@ button:not(:disabled):active { transform: scale(0.97); }
 
 .font-serif { font-variation-settings: "opsz" 72; }
 
-.dark body { background: #16121d; color: #F6F0E5; }
-.dark [class~="bg-[#F3F0E9]"], .dark [class~="bg-[#f3f0e9]"], .dark [class~="bg-[#F8F6F1]"] { background-color: #16121d !important; }
-.dark [class~="bg-[#211B2A]"] { background-color: #0e0b13 !important; }
-.dark [class~="text-[#102936]"] { color: #F6F0E5 !important; }
-.dark [class~="text-[#55707d]"] { color: #CBBFDC !important; }
-.dark [class*="border-[#102936]"] { border-color: rgb(246 240 229 / 20%) !important; }
-.dark [class*="bg-white/"] { background-color: rgb(43 35 54 / 92%) !important; }
-.dark [class~="bg-white"] { background-color: #2b2336 !important; }
-.dark input { color: #F6F0E5; }
-.dark input::placeholder { color: #CBBFDC; }
+/* General theme body overrides */
+.theme-midnight body, .dark body { background: var(--background); color: var(--foreground); }
+.theme-forest body { background: var(--background); color: var(--foreground); }
+.theme-royal body { background: var(--background); color: var(--foreground); }
+
+/* Theme-aware legacy overrides */
+:is(.theme-midnight, .dark, .theme-forest, .theme-royal) [class~="bg-[#F3F0E9]"], 
+:is(.theme-midnight, .dark, .theme-forest, .theme-royal) [class~="bg-[#f3f0e9]"], 
+:is(.theme-midnight, .dark, .theme-forest, .theme-royal) [class~="bg-[#F8F6F1]"] { 
+  background-color: var(--background) !important; 
+}
+
+:is(.theme-midnight, .dark, .theme-forest, .theme-royal) [class~="bg-[#211B2A]"] { 
+  background-color: var(--card) !important; 
+}
+
+:is(.theme-midnight, .dark, .theme-forest, .theme-royal) [class~="text-[#102936]"] { 
+  color: var(--foreground) !important; 
+}
+
+:is(.theme-midnight, .dark, .theme-forest, .theme-royal) [class~="text-[#55707d]"] { 
+  color: var(--muted-foreground) !important; 
+}
+
+:is(.theme-midnight, .dark, .theme-forest, .theme-royal) [class*="border-[#102936]"] { 
+  border-color: var(--border) !important; 
+}
+
+:is(.theme-midnight, .dark, .theme-forest, .theme-royal) [class*="bg-white/"] { 
+  background-color: var(--card) !important; 
+  opacity: 0.92;
+}
+
+:is(.theme-midnight, .dark, .theme-forest, .theme-royal) [class~="bg-white"] { 
+  background-color: var(--card) !important; 
+}
+
+:is(.theme-midnight, .dark, .theme-forest, .theme-royal) input { 
+  color: var(--foreground); 
+}
+
+:is(.theme-midnight, .dark, .theme-forest, .theme-royal) input::placeholder { 
+  color: var(--muted-foreground); 
+}
 
 @media (prefers-reduced-motion: no-preference) {
   #overview > div > div.relative { animation: astral-enter 560ms cubic-bezier(0.23, 1, 0.32, 1) both; }

@@ -196,3 +196,10 @@
 - [x] Restore server-rendered route tests by adding the required React import to the new theme toggle component.
 - [x] Restore the homepage test’s saved-content tRPC mock so the new bookmark controls render in the existing missing-profile test harness.
 - [x] Restore server-rendered homepage tests by adding the required React import to the new saved-content bookmark control.
+
+- [x] Expand the binary dark mode toggle into a multi-theme selector with Paper, Midnight, Forest, and Royal palettes.
+- [x] Define mystical theme design tokens in index.css using OKLCH color variables.
+- [x] Update ThemeContext to support multiple named themes and handle legacy preference migrations.
+- [x] Implement a responsive multi-theme Popover selector in the desktop navigation and a grid selector in the mobile menu.
+- [x] Add automated coverage for theme switching, persistence, and legacy migration in client-side tests.
+- [x] Verify theme-aware legacy color overrides to ensure visual coherence across all palettes.

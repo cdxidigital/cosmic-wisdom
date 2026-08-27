@@ -74,7 +74,7 @@ function ChartDetailsShortcut() {
 function App() {
   return (
     <ErrorBoundary>
-        <ThemeProvider defaultTheme="light" switchable>
+        <ThemeProvider defaultTheme="paper" switchable>
         <TooltipProvider>
           <Toaster theme="light" richColors position="bottom-right" />
           <Router />

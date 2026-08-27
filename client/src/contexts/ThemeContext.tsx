@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "light" | "dark";
+export type Theme = "paper" | "midnight" | "forest" | "royal";
 
 interface ThemeContextType {
   theme: Theme;
-  toggleTheme?: () => void;
+  setTheme: (theme: Theme) => void;
   switchable: boolean;
 }
 
@@ -18,40 +18,55 @@ interface ThemeProviderProps {
 
 export function ThemeProvider({
   children,
-  defaultTheme = "light",
+  defaultTheme = "paper",
   switchable = false,
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(() => {
+  const [theme, setThemeState] = useState<Theme>(() => {
     if (switchable && typeof window !== "undefined") {
-      const stored = localStorage.getItem("theme");
-      if (stored === "light" || stored === "dark") return stored;
-      if (window.matchMedia?.("(prefers-color-scheme: dark)").matches) return "dark";
+      const stored = localStorage.getItem("theme") as Theme;
+      if (["paper", "midnight", "forest", "royal"].includes(stored)) return stored;
+      
+      // Legacy "light"/"dark" migration
+      if (stored === ("light" as any)) return "paper";
+      if (stored === ("dark" as any)) return "midnight";
+
+      if (window.matchMedia?.("(prefers-color-scheme: dark)").matches) return "midnight";
     }
     return defaultTheme;
   });
 
   useEffect(() => {
     const root = document.documentElement;
-    if (theme === "dark") {
+    
+    // Remove all theme classes
+    root.classList.remove("theme-paper", "theme-midnight", "theme-forest", "theme-royal", "dark");
+    
+    // Add new theme class
+    if (theme !== "paper") {
+      root.classList.add(`theme-${theme}`);
+    }
+    
+    // Maintain "dark" class for midnight for backward compatibility with external components
+    if (theme === "midnight") {
       root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
     }
 
     if (switchable) {
       localStorage.setItem("theme", theme);
     }
-    root.style.colorScheme = theme;
+    
+    // Update color-scheme for browser UI
+    root.style.colorScheme = theme === "paper" ? "light" : "dark";
   }, [theme, switchable]);
 
-  const toggleTheme = switchable
-    ? () => {
-        setTheme(prev => (prev === "light" ? "dark" : "light"));
-      }
-    : undefined;
+  const setTheme = (newTheme: Theme) => {
+    if (switchable) {
+      setThemeState(newTheme);
+    }
+  };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, switchable }}>
+    <ThemeContext.Provider value={{ theme, setTheme, switchable }}>
       {children}
     </ThemeContext.Provider>
   );
