@@ -154,3 +154,17 @@
 - [x] Audit the public homepage and unauthenticated private routes to confirm no enriched content reveals raw birth date, time, or location.
 - [x] Restore server-rendered natal component test compatibility by adding the required React imports for the current JSX configuration.
 - [x] Correct the natal privacy test to distinguish method-note labels from actual raw birth-value disclosure.
+- [x] Add a private account-settings page with password update, account-management information, and a deliberate destructive-account control.
+- [ ] Deferred by user: create a one-time, short-lived, hashed password-reset token model with request throttling, generic responses, and single-use invalidation after transactional email delivery is configured.
+- [ ] Deferred by user: integrate a verified transactional email sender for reset-link delivery, including a server-only API secret and no email-account enumeration.
+- [x] Add protected account deletion that requires current-password confirmation, invalidates the session, and deletes or anonymizes all member-owned private records safely.
+- [x] Add an accessible Account Settings route with explicit success, error, and destructive-confirmation states; password-reset routes are deferred.
+- [x] Add automated coverage for password changes, deletion authorization/cascade, and member isolation; password-reset coverage is deferred.
+- [x] Validate password change, deletion, sign-out, and private-route denial across desktop and mobile; reset-email delivery and token redemption are deferred.
+- [x] Diagnose and correct the consented account-settings lifecycle test timeout before retrying password-change and deletion validation.
+- [x] Correct the Account Settings auth-loading redirect race so a valid fresh member session is not sent back to sign-in before its auth query settles.
+- [x] Diagnose the password-update confirmation timeout in the authorized settings lifecycle before the final retry.
+- [x] Add semantic names to Account Settings password and deletion fields so the secure forms can be filled, validated, and tested reliably.
+- [x] Require authentication before rendering natal-details content, so deleted or signed-out members are directed to local account access rather than a private-route empty state.
+- [x] Route signed-out private natal access to the shared local Account entry screen rather than a connected-account-only sign-in control.
+- [x] Align the natal private-gate test assertion with the updated line-broken heading while preserving its access-control coverage.

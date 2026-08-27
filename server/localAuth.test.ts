@@ -3,7 +3,7 @@ import type { TrpcContext } from "./_core/context";
 import { hashPassword } from "./passwordAuth";
 
 const dbMocks = vi.hoisted(() => ({
-  getUserByEmail: vi.fn(), createLocalUser: vi.fn(), touchUserLastSignedIn: vi.fn(),
+  getUserByEmail: vi.fn(), createLocalUser: vi.fn(), touchUserLastSignedIn: vi.fn(), updateUserPasswordHash: vi.fn(), deleteMemberAccount: vi.fn(),
 }));
 const sdkMocks = vi.hoisted(() => ({ createSessionToken: vi.fn() }));
 
@@ -15,6 +15,9 @@ import { appRouter } from "./routers";
 const member = { id: 31, openId: "local_member", name: "Parker", email: "parker@example.com", loginMethod: "email_password", role: "user" as const, createdAt: new Date(), updatedAt: new Date(), lastSignedIn: new Date() };
 function context() {
   return { user: null, req: { protocol: "https", headers: {}, ip: "203.0.113.42" }, res: { cookie: vi.fn(), clearCookie: vi.fn() } } as unknown as TrpcContext;
+}
+function memberContext(passwordHash?: string) {
+  return { user: { ...member, passwordHash }, req: { protocol: "https", headers: {}, ip: "203.0.113.42" }, res: { cookie: vi.fn(), clearCookie: vi.fn() } } as unknown as TrpcContext;
 }
 
 describe("local email account procedures", () => {
@@ -58,5 +61,27 @@ describe("local email account procedures", () => {
     await expect(appRouter.createCaller(ctx).auth.signInWithEmail({ email: "Parker@Example.com", password: "CorrectPassword42" })).resolves.toEqual({ id: 31, name: "Parker", email: "parker@example.com" });
     expect(dbMocks.touchUserLastSignedIn).toHaveBeenCalledWith(31);
     expect((ctx.res as any).cookie).toHaveBeenCalledWith(expect.any(String), "local-session-token", expect.objectContaining({ httpOnly: true, secure: true }));
+  });
+
+  it("returns safe account settings and requires the current password before an existing password can change", async () => {
+    const passwordHash = await hashPassword("CorrectPassword42");
+    const ctx = memberContext(passwordHash); const caller = appRouter.createCaller(ctx);
+    await expect(caller.auth.getAccountSettings()).resolves.toEqual({ name: "Parker", email: "parker@example.com", loginMethod: "email_password", hasPassword: true });
+    await expect(caller.auth.changePassword({ currentPassword: "IncorrectPassword42", newPassword: "UpdatedPassword42" })).rejects.toThrow("current password");
+    expect(dbMocks.updateUserPasswordHash).not.toHaveBeenCalled();
+    await expect(caller.auth.changePassword({ currentPassword: "CorrectPassword42", newPassword: "UpdatedPassword42" })).resolves.toEqual({ success: true });
+    expect(dbMocks.updateUserPasswordHash).toHaveBeenCalledWith(31, expect.stringMatching(/^scrypt-v1\$/));
+    expect(dbMocks.updateUserPasswordHash.mock.calls[0][1]).not.toContain("UpdatedPassword42");
+  });
+
+  it("deletes only the current member after a deliberate phrase and valid local password, then clears the shared cookie", async () => {
+    const passwordHash = await hashPassword("CorrectPassword42");
+    dbMocks.deleteMemberAccount.mockResolvedValue({ deletedFileReferenceCount: 2 });
+    const ctx = memberContext(passwordHash); const caller = appRouter.createCaller(ctx);
+    await expect(caller.auth.deleteAccount({ confirmation: "DELETE MY ACCOUNT", currentPassword: "IncorrectPassword42" })).rejects.toThrow("current password");
+    expect(dbMocks.deleteMemberAccount).not.toHaveBeenCalled();
+    await expect(caller.auth.deleteAccount({ confirmation: "DELETE MY ACCOUNT", currentPassword: "CorrectPassword42" })).resolves.toEqual({ success: true, deletedFileReferenceCount: 2 });
+    expect(dbMocks.deleteMemberAccount).toHaveBeenCalledWith(31);
+    expect((ctx.res as any).clearCookie).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({ httpOnly: true, secure: true, maxAge: -1 }));
   });
 });

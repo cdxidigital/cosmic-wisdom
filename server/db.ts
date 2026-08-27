@@ -116,6 +116,24 @@ export async function touchUserLastSignedIn(userId: number) {
   await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.id, userId));
 }
 
+export async function updateUserPasswordHash(userId: number, passwordHash: string) {
+  const db = await requireDb();
+  await db.update(users).set({ passwordHash, lastSignedIn: new Date() }).where(eq(users.id, userId));
+}
+
+/**
+ * Removes the member record and all database-owned private data through the schema’s
+ * foreign-key cascades. Storage object deletion is intentionally unavailable in the
+ * managed storage layer; deleting metadata and every reference makes stored bytes
+ * inaccessible, as required by the storage contract.
+ */
+export async function deleteMemberAccount(userId: number) {
+  const db = await requireDb();
+  const files = await db.select({ id: cosmicFiles.id }).from(cosmicFiles).where(eq(cosmicFiles.userId, userId));
+  await db.delete(users).where(eq(users.id, userId));
+  return { deletedFileReferenceCount: files.length };
+}
+
 export async function getCosmicProfileByUserId(userId: number): Promise<CosmicProfile | null> {
   const db = await requireDb();
   const result = await db.select().from(cosmicProfiles).where(eq(cosmicProfiles.userId, userId)).limit(1);

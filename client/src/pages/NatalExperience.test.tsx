@@ -32,7 +32,10 @@ describe("private natal teaching surfaces", () => {
 
   it("keeps teaching and natal details behind the member gate", () => {
     expect(renderToStaticMarkup(<DailyRitual />)).toContain("Your daily teaching is private.");
-    expect(renderToStaticMarkup(<NatalDetails />)).toContain("Your chart details are private.");
+    const details = renderToStaticMarkup(<NatalDetails />);
+    expect(details).toContain("Your chart details");
+    expect(details).toContain("are private.");
+    expect(details).toContain('href="/account"');
   });
 
   it("gives authenticated members with no chart a clear next step without inventing a teaching", () => {

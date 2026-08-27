@@ -19,6 +19,7 @@ import {
 import {
   createCosmicFileRecord,
   createLocalUser,
+  deleteMemberAccount,
   getCosmicFileByUserIdAndId,
   getCosmicNatalChartByUserId,
   getCosmicProfileByUserId,
@@ -32,6 +33,7 @@ import {
   saveCosmicReading,
   saveCosmicNatalChart,
   touchUserLastSignedIn,
+  updateUserPasswordHash,
 } from "./db";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { hashPassword, normalizeAccountEmail, validatePassword, verifyPassword } from "./passwordAuth";
@@ -50,6 +52,16 @@ const localAccountInput = z.object({
 const localSignInInput = z.object({
   email: z.string().trim().email("Enter a valid email address.").max(320),
   password: z.string().min(1).max(128),
+});
+
+const changePasswordInput = z.object({
+  currentPassword: z.string().max(128).optional(),
+  newPassword: z.string().min(12).max(128),
+});
+
+const deleteAccountInput = z.object({
+  confirmation: z.literal("DELETE MY ACCOUNT"),
+  currentPassword: z.string().max(128).optional(),
 });
 
 const failedSignIns = new Map<string, { count: number; resetAt: number }>();
@@ -105,6 +117,29 @@ export const appRouter = router({
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return { success: true } as const;
+    }),
+    getAccountSettings: protectedProcedure.query(({ ctx }) => ({
+      name: ctx.user.name?.trim() || "Cosmic member",
+      email: ctx.user.email ?? null,
+      loginMethod: ctx.user.loginMethod ?? "connected account",
+      hasPassword: Boolean(ctx.user.passwordHash),
+    })),
+    changePassword: protectedProcedure.input(changePasswordInput).mutation(async ({ ctx, input }) => {
+      const passwordCheck = validatePassword(input.newPassword);
+      if (!passwordCheck.valid) throw new Error(passwordCheck.message);
+      if (ctx.user.passwordHash && !(await verifyPassword(input.currentPassword ?? "", ctx.user.passwordHash))) {
+        throw new Error("Your current password is incorrect.");
+      }
+      await updateUserPasswordHash(ctx.user.id, await hashPassword(input.newPassword));
+      return { success: true } as const;
+    }),
+    deleteAccount: protectedProcedure.input(deleteAccountInput).mutation(async ({ ctx, input }) => {
+      if (ctx.user.passwordHash && !(await verifyPassword(input.currentPassword ?? "", ctx.user.passwordHash))) {
+        throw new Error("Your current password is incorrect.");
+      }
+      const result = await deleteMemberAccount(ctx.user.id);
+      ctx.res.clearCookie(COOKIE_NAME, { ...getSessionCookieOptions(ctx.req), maxAge: -1 });
+      return { success: true, ...result } as const;
     }),
   }),
   cosmic: router({

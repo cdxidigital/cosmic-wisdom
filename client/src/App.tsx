@@ -14,6 +14,7 @@ import Numerology from "./pages/Numerology";
 import PalmistryBeta from "./pages/PalmistryBeta";
 import Compatibility from "./pages/Compatibility";
 import Account from "./pages/Account";
+import AccountSettings from "./pages/AccountSettings";
 import NatalDetails from "./pages/NatalDetails";
 import DailyRitualPage from "./pages/DailyRitualPage";
 
@@ -38,6 +39,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/account" component={Account} />
+      <Route path="/account/settings" component={AccountSettings} />
       <Route path="/tarot/placement" component={TarotPage} />
       <Route path="/tarot" component={TarotPage} />
       <Route path="/palmistry" component={PalmistryPage} />
@@ -54,7 +56,7 @@ function Router() {
 function ChartDetailsShortcut() {
   const [location] = useLocation();
   if (location !== "/") return null;
-  return <div className="fixed bottom-4 left-4 z-30 flex gap-2"><a href="/natal-details" className="border border-[#102936]/15 bg-[#F3F0E9]/95 px-3 py-2 font-mono text-[8px] tracking-[.13em] text-[#55707d] shadow-sm transition-colors hover:border-[#B63C5E] hover:text-[#B63C5E]">CHART DETAILS ↗</a><a href="/daily-ritual" className="border border-[#102936]/15 bg-[#F3F0E9]/95 px-3 py-2 font-mono text-[8px] tracking-[.13em] text-[#55707d] shadow-sm transition-colors hover:border-[#B63C5E] hover:text-[#B63C5E]">DAILY RITUAL ↗</a></div>;
+  return <div className="fixed bottom-4 left-4 z-30 flex flex-wrap gap-2"><a href="/natal-details" className="border border-[#102936]/15 bg-[#F3F0E9]/95 px-3 py-2 font-mono text-[8px] tracking-[.13em] text-[#55707d] shadow-sm transition-colors hover:border-[#B63C5E] hover:text-[#B63C5E]">CHART DETAILS ↗</a><a href="/daily-ritual" className="border border-[#102936]/15 bg-[#F3F0E9]/95 px-3 py-2 font-mono text-[8px] tracking-[.13em] text-[#55707d] shadow-sm transition-colors hover:border-[#B63C5E] hover:text-[#B63C5E]">DAILY RITUAL ↗</a><a href="/account/settings" className="border border-[#102936]/15 bg-[#F3F0E9]/95 px-3 py-2 font-mono text-[8px] tracking-[.13em] text-[#55707d] shadow-sm transition-colors hover:border-[#B63C5E] hover:text-[#B63C5E]">ACCOUNT SETTINGS ↗</a></div>;
 }
 
 function App() {
