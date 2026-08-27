@@ -91,12 +91,28 @@
 - [x] Restore the private consent-based Compatibility route with communication, emotional, attraction, and friction lenses.
 - [x] Restore optional healthy daily reflection check-ins without streak or pressure mechanics.
 - [x] Restore the Palmistry structured camera-denied recovery card with no-camera and retry controls.
-- [ ] Revalidate the recovered expansion across desktop, mobile, permissions, privacy, and all application checks.
+- [x] Revalidate the recovered expansion across desktop, mobile, permissions, privacy, and all application checks.
 - [x] Gate Compatibility behind an authenticated natal profile and an explicit consent acknowledgement.
-- [ ] Verify the recovered Compatibility entry point from home on desktop and mobile.
-- [ ] Run a recorded full recovered-release validation pass across home navigation, Compatibility, Palmistry denial fallback, responsive rendering, tests, and production build.
+- [x] Verify the recovered Compatibility entry point from home on desktop and mobile.
+- [x] Run a recorded full recovered-release validation pass across home navigation, Compatibility, Palmistry denial fallback, responsive rendering, tests, and production build.
 - [x] Add a natal source-details disclosure and verify its on-demand metadata rendering.
 - [x] Implement and surface calculated house-focus interpretation with test coverage.
-- [ ] Exercise Compatibility through the real mobile home menu and record the destination state.
+- [x] Exercise Compatibility through the real mobile home menu and record the destination state.
 - [x] Link the Home natal experience to the private on-demand chart details screen.
-- [ ] Open and expand the natal calculation-notes disclosure in the browser at desktop and mobile layouts.
+- [x] Open and expand the natal calculation-notes disclosure in the browser at desktop and mobile layouts.
+- [x] Record an explicit desktop `details.open` verification for the private natal calculation-notes disclosure.
+- [x] Run a successful authenticated 375px mobile verification that records the natal calculation-notes disclosure open state.
+- [x] Run a consented date-based compatibility lens for Steven Edgintonm, retaining Yanchep only as an optional non-computational browser-local note, without a birth-time-based Rising or house claim.
+- [x] Verify Steven’s supplied information is treated as request-only and is not persisted as a profile or file record.
+- [x] Correct the Compatibility profile gate so an authenticated member with an existing natal profile can open the private browser-local lens.
+- [x] Remove the narrow-screen truncation from the optional birth-location input while preserving its no-birth-time limitation.
+- [x] Align the completed compatibility task record with the implemented date-based reflection and optional non-computational location note.
+- [x] Verify from code and runtime evidence that Compatibility writes no partner profile, reading-history, or file record.
+- [x] Add and test a homepage meta keywords tag with 3–8 focused terms.
+- [x] Add and test a homepage meta description of 50–160 characters.
+- [x] Ensure the homepage document title is 30–60 characters at runtime and in static markup.
+- [x] Add and test a descriptive homepage H2 heading of 80 characters or fewer.
+- [x] Complete a double validation pass across all primary routes, navigation, private gates, mobile layouts, automated checks, and production build.
+- [x] Remove the reintroduced external natal-calculation provider name from all member-facing homepage copy.
+- [x] Validate the live 375px home-menu Compatibility navigation and destination state in an independent browser session.
+- [x] Re-exercise Palmistry camera-unavailable or permission-denied recovery during the final validation pass without retaining imagery.
