@@ -114,22 +114,4 @@ button:not(:disabled):active { transform: scale(0.97); }
 @media (prefers-reduced-motion: no-preference) {
   #overview > div > div.relative { animation: astral-enter 560ms cubic-bezier(0.23, 1, 0.32, 1) both; }
   @keyframes astral-enter { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-  .cosmic-route-enter { animation: cosmic-route-enter 280ms cubic-bezier(0.23, 1, 0.32, 1) both; }
-  .cosmic-route-loading__panel { animation: cosmic-route-panel 260ms cubic-bezier(0.23, 1, 0.32, 1) both; }
-  .cosmic-route-loading__orbit { animation: cosmic-route-orbit 1.15s linear infinite; }
-  .cosmic-route-loading__orbit span { animation: cosmic-route-signal 900ms cubic-bezier(0.23, 1, 0.32, 1) infinite alternate; }
-  @keyframes cosmic-route-enter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes cosmic-route-panel { from { opacity: 0; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
-  @keyframes cosmic-route-orbit { to { transform: rotate(360deg); } }
-  @keyframes cosmic-route-signal { from { transform: scale(.72); opacity: .45; } to { transform: scale(1); opacity: 1; } }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cosmic-route-enter,
-  .cosmic-route-loading__panel,
-  .cosmic-route-loading__orbit,
-  .cosmic-route-loading__orbit span {
-    animation: none !important;
-    transition-duration: 0.01ms !important;
-  }
 }

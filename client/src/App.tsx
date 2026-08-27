@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch, useLocation } from "wouter";
-import { lazy, Suspense, type ComponentType, type ReactNode } from "react";
+import { lazy, Suspense, type ComponentType } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
@@ -21,21 +21,17 @@ const Numerology = lazy(() => import("./pages/Numerology"));
 const PalmistryBeta = lazy(() => import("./pages/PalmistryBeta"));
 
 function StudioLoading() {
-  return <main aria-busy="true" aria-live="polite" className="cosmic-route-loading flex min-h-screen items-center justify-center bg-[#F3F0E9] px-5 text-[#102936]"><div role="status" className="cosmic-route-loading__panel border border-[#102936]/15 bg-white/50 px-8 py-9 text-center shadow-sm"><div aria-hidden="true" className="cosmic-route-loading__orbit mx-auto mb-5 flex h-11 w-11 items-center justify-center border border-[#B63C5E]/50"><span className="block h-2 w-2 rounded-full bg-[#B63C5E]" /></div><p className="font-mono text-[10px] font-semibold tracking-[.16em]">OPENING YOUR COSMIC LENS…</p><p className="mt-3 font-sans text-xs text-[#6E6079]">Preparing a private reading surface.</p></div></main>;
-}
-
-function RouteTransition({ children }: { children: ReactNode }) {
-  return <div className="cosmic-route-enter">{children}</div>;
+  return <main className="flex min-h-screen items-center justify-center bg-[#F3F0E9] text-[#102936]"><p className="font-mono text-[10px] font-semibold tracking-[.16em]">OPENING COSMIC STUDIO…</p></main>;
 }
 
 function loadPage(Page: ComponentType) {
   return function LazyCosmicPage() {
-    return <Suspense fallback={<StudioLoading />}><RouteTransition><Page /></RouteTransition></Suspense>;
+    return <Suspense fallback={<StudioLoading />}><Page /></Suspense>;
   };
 }
 
 function TarotPage() {
-  return <Suspense fallback={<StudioLoading />}><RouteTransition><TarotStudio /></RouteTransition></Suspense>;
+  return <Suspense fallback={<StudioLoading />}><TarotStudio /></Suspense>;
 }
 
 const AccountPage = loadPage(Account);
