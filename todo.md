@@ -184,3 +184,6 @@
 - [x] Stabilize the timed-out external natal credential regression so a transient upstream delay cannot block the full audit suite.
 - [x] Confirm signed-out Account Settings reaches local Account entry after its normal auth-loading transition rather than an indefinite loading state.
 - [x] Reduce the oversized initial production bundle by lazy-loading non-home Cosmic routes while preserving loading and navigation states.
+- [x] Add smooth, bounded loading and route-transition effects for lazy-loaded secondary experiences.
+- [x] Preserve instant reduced-motion behaviour and accessible loading announcements for all lazy route changes.
+- [x] Validate desktop and mobile route transitions for Account, settings, readings, Compatibility, natal details, and daily ritual.
