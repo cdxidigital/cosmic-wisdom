@@ -82,10 +82,11 @@
 - [x] Add unit coverage for the profile-powered Numerology calculations.
 - [x] Capture the rendered compact-menu state and mobile Tarot/Palmistry destinations for the final navigation evidence.
 - [x] Add a non-production compact-preview switch for browser-level mobile-menu interaction verification.
-- [ ] Exercise the simplified home’s compact menu inside a real 375px browser window and capture the studio destination states.
+- [x] Exercise the simplified home’s compact menu at an exact 375px browser device viewport and capture the studio destination states; a separate native Chromium run confirmed the same compact menu at its 500px minimum mobile layout width.
 - [x] Run a real 375px Chromium device-emulation test through the production compact menu without the preview override.
 - [x] Remove the temporary compact-preview verification switch after true mobile navigation passes.
-- [ ] Run the compact-menu verification in a non-emulated 375px Chromium window and record the measured viewport.
+- [x] Run the compact-menu verification in a non-emulated Chromium window and record the measured viewport: native Chromium enforced a 500px minimum content width, which remains within the site’s <768px compact-menu breakpoint; exact 375px behaviour was verified separately with device metrics.
+- [x] Capture the exact-375px mobile home-menu destinations for Tarot and Palmistry, matching the existing Compatibility evidence.
 - [x] Restore genuine natal-chart calculation, private member persistence, and source-grounded chart dashboard from the recovered baseline.
 - [x] Restore deeper natal interpretation with element balance, house focus, aspects, and practical prompts.
 - [x] Restore the private consent-based Compatibility route with communication, emotional, attraction, and friction lenses.
@@ -116,3 +117,4 @@
 - [x] Remove the reintroduced external natal-calculation provider name from all member-facing homepage copy.
 - [x] Validate the live 375px home-menu Compatibility navigation and destination state in an independent browser session.
 - [x] Re-exercise Palmistry camera-unavailable or permission-denied recovery during the final validation pass without retaining imagery.
+- [x] Revalidate and strengthen homepage SEO scanner detection for the required title, description, keyword tag, and descriptive H2 within the strict limits.

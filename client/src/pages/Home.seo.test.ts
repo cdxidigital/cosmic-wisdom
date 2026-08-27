@@ -25,8 +25,10 @@ describe("homepage SEO constraints", () => {
     expect(description.length).toBeLessThanOrEqual(160);
     expect(h2.length).toBeGreaterThan(0);
     expect(h2.length).toBeLessThanOrEqual(80);
+    expect(indexHtml).toContain('<main id="static-page-summary">');
+    expect(indexHtml).not.toContain("<noscript>");
     expect(homeSource).toContain("document.title = HOME_TITLE");
-    expect(homeSource).toContain('const HOME_TITLE = "Cosmic Wisdom: Astrology, Tarot & Numerology"');
+    expect(homeSource).toContain('const HOME_TITLE = "Cosmic Wisdom: Private Astrology, Tarot and Numerology"');
     expect(imageAlts).toHaveLength(3);
     expect(imageAlts.every(Boolean)).toBe(true);
   });

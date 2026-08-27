@@ -7,7 +7,7 @@ import React, { FormEvent, useEffect, useState } from "react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 
-const HOME_TITLE = "Cosmic Wisdom: Astrology, Tarot & Numerology";
+const HOME_TITLE = "Cosmic Wisdom: Private Astrology, Tarot and Numerology";
 type SourceRecord = Record<string, unknown>;
 
 function asRecord(value: unknown): SourceRecord | null {
