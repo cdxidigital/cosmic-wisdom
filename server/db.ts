@@ -111,6 +111,11 @@ export async function createLocalUser(input: { email: string; displayName: strin
   return user;
 }
 
+export async function touchUserLastSignedIn(userId: number) {
+  const db = await requireDb();
+  await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.id, userId));
+}
+
 export async function getCosmicProfileByUserId(userId: number): Promise<CosmicProfile | null> {
   const db = await requireDb();
   const result = await db.select().from(cosmicProfiles).where(eq(cosmicProfiles.userId, userId)).limit(1);

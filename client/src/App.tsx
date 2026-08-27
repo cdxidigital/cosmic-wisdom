@@ -13,6 +13,7 @@ import Home from "./pages/Home";
 import Numerology from "./pages/Numerology";
 import PalmistryBeta from "./pages/PalmistryBeta";
 import Compatibility from "./pages/Compatibility";
+import Account from "./pages/Account";
 import NatalDetails from "./pages/NatalDetails";
 import DailyRitualPage from "./pages/DailyRitualPage";
 
@@ -36,6 +37,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/account" component={Account} />
       <Route path="/tarot/placement" component={TarotPage} />
       <Route path="/tarot" component={TarotPage} />
       <Route path="/palmistry" component={PalmistryPage} />

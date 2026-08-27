@@ -2,7 +2,7 @@
  * Cosmic’s tRPC boundary exposes private data only through authenticated procedures.
  * Each write resolves ownership from ctx.user instead of trusting a client-supplied user ID.
  */
-import { COOKIE_NAME } from "@shared/const";
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { Buffer } from "node:buffer";
 import { z } from "zod";
 import {
@@ -18,9 +18,11 @@ import {
 } from "./cosmicSchemas";
 import {
   createCosmicFileRecord,
+  createLocalUser,
   getCosmicFileByUserIdAndId,
   getCosmicNatalChartByUserId,
   getCosmicProfileByUserId,
+  getUserByEmail,
   listCosmicDailyBriefs,
   listCosmicFiles,
   listCosmicReadings,
@@ -29,17 +31,76 @@ import {
   saveCosmicProfile,
   saveCosmicReading,
   saveCosmicNatalChart,
+  touchUserLastSignedIn,
 } from "./db";
 import { getSessionCookieOptions } from "./_core/cookies";
+import { hashPassword, normalizeAccountEmail, validatePassword, verifyPassword } from "./passwordAuth";
+import { sdk } from "./_core/sdk";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { storageGetSignedUrl, storagePut } from "./storage";
 import { calculateNatalChart } from "./natalAstrology";
 
+const localAccountInput = z.object({
+  displayName: z.string().trim().min(1, "Enter your name.").max(120),
+  email: z.string().trim().email("Enter a valid email address.").max(320),
+  password: z.string().min(12).max(128),
+});
+
+const localSignInInput = z.object({
+  email: z.string().trim().email("Enter a valid email address.").max(320),
+  password: z.string().min(1).max(128),
+});
+
+const failedSignIns = new Map<string, { count: number; resetAt: number }>();
+const MAX_FAILED_SIGN_INS = 5;
+const SIGN_IN_WINDOW_MS = 15 * 60 * 1000;
+
+function signInKey(email: string, ip: string | undefined) { return `${email}:${ip ?? "unknown"}`; }
+function checkSignInRate(key: string) {
+  const attempt = failedSignIns.get(key);
+  if (!attempt) return;
+  if (attempt.resetAt <= Date.now()) { failedSignIns.delete(key); return; }
+  if (attempt.count >= MAX_FAILED_SIGN_INS) throw new Error("Too many sign-in attempts. Please wait 15 minutes and try again.");
+}
+function recordFailedSignIn(key: string) {
+  const existing = failedSignIns.get(key);
+  const fresh = !existing || existing.resetAt <= Date.now();
+  failedSignIns.set(key, { count: fresh ? 1 : existing.count + 1, resetAt: Date.now() + SIGN_IN_WINDOW_MS });
+}
+
+async function issueLocalSession(ctx: { req: import("express").Request; res: import("express").Response }, user: { openId: string; name: string | null; email: string | null; id: number }) {
+  const displayName = user.name?.trim() || "Cosmic member";
+  const sessionToken = await sdk.createSessionToken(user.openId, { expiresInMs: ONE_YEAR_MS, name: displayName });
+  ctx.res.cookie(COOKIE_NAME, sessionToken, { ...getSessionCookieOptions(ctx.req), maxAge: ONE_YEAR_MS });
+  return { id: user.id, name: displayName, email: user.email };
+}
+
 export const appRouter = router({
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
+    registerWithEmail: publicProcedure.input(localAccountInput).mutation(async ({ ctx, input }) => {
+      const email = normalizeAccountEmail(input.email);
+      const passwordCheck = validatePassword(input.password);
+      if (!passwordCheck.valid) throw new Error(passwordCheck.message);
+      if (await getUserByEmail(email)) throw new Error("An account with that email already exists. Sign in instead.");
+      const user = await createLocalUser({ email, displayName: input.displayName.trim(), passwordHash: await hashPassword(input.password) });
+      return issueLocalSession(ctx, user);
+    }),
+    signInWithEmail: publicProcedure.input(localSignInInput).mutation(async ({ ctx, input }) => {
+      const email = normalizeAccountEmail(input.email);
+      const key = signInKey(email, ctx.req.ip);
+      checkSignInRate(key);
+      const user = await getUserByEmail(email);
+      if (!user || !(await verifyPassword(input.password, user.passwordHash))) {
+        recordFailedSignIn(key);
+        throw new Error("Invalid email or password.");
+      }
+      failedSignIns.delete(key);
+      await touchUserLastSignedIn(user.id);
+      return issueLocalSession(ctx, user);
+    }),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });

@@ -118,12 +118,23 @@
 - [x] Validate the live 375px home-menu Compatibility navigation and destination state in an independent browser session.
 - [x] Re-exercise Palmistry camera-unavailable or permission-denied recovery during the final validation pass without retaining imagery.
 - [x] Revalidate and strengthen homepage SEO scanner detection for the required title, description, keyword tag, and descriptive H2 within the strict limits.
-- [ ] Define and migrate a password-hash field for local email accounts without weakening existing OAuth identities.
-- [ ] Add authenticated registration and sign-in procedures with email normalization, strong password validation, hashing, and rate-safe generic failures.
-- [ ] Issue and clear secure local-account sessions compatible with the existing private member context.
-- [ ] Add an accessible email-and-password register/sign-in interface alongside the current member flow.
-- [ ] Add automated tests for password rules, duplicate-email handling, bad credentials, session issuance, logout, and member isolation.
-- [ ] Validate registration, sign-in, sign-out, and private-profile gating in desktop and mobile browser flows.
+- [x] Define and migrate a password-hash field for local email accounts without weakening existing OAuth identities.
+- [x] Add authenticated registration and sign-in procedures with email normalization, strong password validation, hashing, and rate-safe generic failures.
+- [x] Issue and clear secure local-account sessions compatible with the existing private member context.
+- [x] Add an accessible email-and-password register/sign-in interface alongside the current member flow.
+- [x] Add automated tests for password rules, duplicate-email handling, bad credentials, session issuance, logout, and member isolation.
+- [x] Validate registration, sign-in, sign-out, and private-profile gating in desktop and mobile browser flows.
+- [x] Add an accessible sign-out control to the custom private profile experience so local members can end their shared session deliberately.
+- [x] Run one consented disposable local-account browser flow covering registration, private-route access, sign-out, sign-in, and cleanup.
+- [x] Diagnose and correct the disposable-account test harness exception before the live local-account validation retry.
+- [x] Resolve the disposable-account harness response-serialization error and complete the approved lifecycle verification with cleanup.
+- [x] Run an independent desktop disposable-account flow covering registration, protected-route access, visible sign-out, sign-in, and cleanup.
+- [x] Add the verified accessible Sign Out identifier to the desktop member navigation for consistent lifecycle testing and assistive access.
+- [x] Correct the local-account password-storage copy to accurately describe salted hashing rather than encryption.
+- [x] Add local-account member-isolation coverage for protected profile, files, and readings after a password session is issued.
+- [x] Add local-account logout coverage that verifies the shared session cookie is cleared after password-session use.
+- [x] Correct local-session tests to use the project’s actual shared cookie constant rather than a hardcoded cookie name.
+- [x] Complete the local-session test mock with the existing user-sync helper used after shared-token authentication.
 - [x] Diagnose the repeated Tarot draw behaviour and confirm the deck source is complete enough for three-card readings.
 - [x] Implement a secure Fisher–Yates shuffle with an in-session draw pile so a card cannot repeat within a spread.
 - [x] Add a clear three-card reading synthesis that combines Context, Threshold, and Orientation after all cards are drawn.
