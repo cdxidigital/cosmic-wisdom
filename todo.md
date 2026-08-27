@@ -168,3 +168,19 @@
 - [x] Require authentication before rendering natal-details content, so deleted or signed-out members are directed to local account access rather than a private-route empty state.
 - [x] Route signed-out private natal access to the shared local Account entry screen rather than a connected-account-only sign-in control.
 - [x] Align the natal private-gate test assertion with the updated line-broken heading while preserving its access-control coverage.
+- [x] Audit all registered routes, navigation paths, protected states, browser console output, and recent server logs on the current release.
+- [x] Audit mobile and desktop layouts for visual overflow, inaccessible controls, broken destination states, and confusing account/session transitions.
+- [x] Repair every confirmed application, privacy, accessibility, or responsive defect found in the independent audit.
+- [x] Add or extend automated tests for every repaired defect and run a clean production build.
+- [x] Revalidate repaired public, authenticated, mobile, and privacy-sensitive flows before saving the audit checkpoint.
+- [x] Route signed-out natal calculation requests to the shared local Account entry screen instead of connected-account-only login.
+- [x] Correct the mobile menu trigger’s accessible label to reflect its open and closed state.
+- [x] Align the visible footer wordmark with the established COSMIC WISDOM product name used in the header and account experience.
+- [x] Add and verify a crawler-detectable homepage meta keywords tag with 3–8 focused terms.
+- [x] Add and verify a crawler-detectable homepage meta description of 50–160 characters.
+- [x] Set and verify a 30–60 character homepage document title in static markup and at runtime.
+- [x] Add and verify a descriptive crawler-detectable homepage H2 of 80 characters or fewer.
+- [x] Add and verify non-empty descriptive alternative text for each homepage image.
+- [x] Stabilize the timed-out external natal credential regression so a transient upstream delay cannot block the full audit suite.
+- [x] Confirm signed-out Account Settings reaches local Account entry after its normal auth-loading transition rather than an indefinite loading state.
+- [x] Reduce the oversized initial production bundle by lazy-loading non-home Cosmic routes while preserving loading and navigation states.

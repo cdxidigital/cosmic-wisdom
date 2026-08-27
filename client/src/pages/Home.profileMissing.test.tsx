@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import React from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -42,5 +44,13 @@ describe("Home profile-missing journey", () => {
     expect(page).toContain("Tarot");
     expect(page).toContain("Palmistry");
     expect(page).not.toContain("Welcome back,");
+  });
+
+  it("keeps local account access, mobile menu semantics, and the visible wordmark consistent", () => {
+    const source = readFileSync(resolve(process.cwd(), "client/src/pages/Home.tsx"), "utf8");
+
+    expect(source).toContain('window.location.href = "/account"');
+    expect(source).toContain('aria-label={menuOpen ? "Close menu" : "Open menu"}');
+    expect((source.match(/>COSMIC WISDOM</g) ?? []).length).toBeGreaterThanOrEqual(2);
   });
 });
