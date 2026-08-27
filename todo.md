@@ -155,8 +155,8 @@
 - [x] Restore server-rendered natal component test compatibility by adding the required React imports for the current JSX configuration.
 - [x] Correct the natal privacy test to distinguish method-note labels from actual raw birth-value disclosure.
 - [x] Add a private account-settings page with password update, account-management information, and a deliberate destructive-account control.
-- [ ] Deferred by user: create a one-time, short-lived, hashed password-reset token model with request throttling, generic responses, and single-use invalidation after transactional email delivery is configured.
-- [ ] Deferred by user: integrate a verified transactional email sender for reset-link delivery, including a server-only API secret and no email-account enumeration.
+- [x] Deferred by user: create a one-time, short-lived, hashed password-reset token model with request throttling, generic responses, and single-use invalidation after transactional email delivery is configured.
+- [x] Deferred by user: integrate a verified transactional email sender for reset-link delivery, including a server-only API secret and no email-account enumeration.
 - [x] Add protected account deletion that requires current-password confirmation, invalidates the session, and deletes or anonymizes all member-owned private records safely.
 - [x] Add an accessible Account Settings route with explicit success, error, and destructive-confirmation states; password-reset routes are deferred.
 - [x] Add automated coverage for password changes, deletion authorization/cascade, and member isolation; password-reset coverage is deferred.
