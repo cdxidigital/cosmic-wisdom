@@ -4,6 +4,8 @@ import { hashPassword } from "./passwordAuth";
 
 const dbMocks = vi.hoisted(() => ({
   getUserByEmail: vi.fn(), createLocalUser: vi.fn(), touchUserLastSignedIn: vi.fn(), updateUserPasswordHash: vi.fn(), deleteMemberAccount: vi.fn(),
+  createEmailVerificationToken: vi.fn(), createPasswordResetToken: vi.fn(), getPasswordResetToken: vi.fn(), usePasswordResetToken: vi.fn(),
+  getEmailVerificationToken: vi.fn(), useEmailVerificationToken: vi.fn(),
 }));
 const sdkMocks = vi.hoisted(() => ({ createSessionToken: vi.fn() }));
 
@@ -85,3 +87,21 @@ describe("local email account procedures", () => {
     expect((ctx.res as any).clearCookie).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({ httpOnly: true, secure: true, maxAge: -1 }));
   });
 });
+
+  it("processes a password reset request and generates a secure token", async () => {
+    dbMocks.getUserByEmail.mockResolvedValue(member);
+    const caller = appRouter.createCaller(context());
+    const result = await caller.auth.requestPasswordReset({ email: "parker@example.com" });
+    expect(result.success).toBe(true);
+    expect(dbMocks.createPasswordResetToken).toHaveBeenCalledWith(member.id, expect.any(String), expect.any(Date));
+  });
+
+  it("updates the password using a valid reset token", async () => {
+    const token = "valid-reset-token";
+    dbMocks.getPasswordResetToken.mockResolvedValue({ id: 1, userId: member.id, token, expiresAt: new Date(Date.now() + 3600000), usedAt: null });
+    const caller = appRouter.createCaller(context());
+    const result = await caller.auth.resetPassword({ token, newPassword: "NewStrongPassword123!" });
+    expect(result.success).toBe(true);
+    expect(dbMocks.updateUserPasswordHash).toHaveBeenCalledWith(member.id, expect.stringMatching(/^scrypt-v1\$/));
+    expect(dbMocks.usePasswordResetToken).toHaveBeenCalledWith(1);
+  });

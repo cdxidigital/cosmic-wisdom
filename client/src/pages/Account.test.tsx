@@ -1,3 +1,4 @@
+/** @vitest-environment jsdom */
 import { renderToStaticMarkup } from "react-dom/server";
 import React from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -8,12 +9,20 @@ vi.mock("@/const", () => ({ startLogin: vi.fn() }));
 vi.mock("@/lib/trpc", () => ({
   trpc: {
     useUtils: () => ({ auth: { me: { invalidate: vi.fn() } } }),
-    auth: { registerWithEmail: { useMutation: () => mutation }, signInWithEmail: { useMutation: () => mutation } },
+    auth: { 
+      registerWithEmail: { useMutation: () => mutation }, 
+      signInWithEmail: { useMutation: () => mutation },
+      requestPasswordReset: { useMutation: () => mutation },
+      resetPassword: { useMutation: () => mutation }
+    },
   },
 }));
 vi.mock("wouter", async () => {
   const ReactModule = await import("react");
-  return { Link: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => ReactModule.createElement("a", { href, ...props }, children) };
+  return { 
+    Link: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => ReactModule.createElement("a", { href, ...props }, children),
+    useLocation: () => ["/account", vi.fn()]
+  };
 });
 
 import Account from "./Account";
@@ -29,5 +38,10 @@ describe("local account entry", () => {
     expect(page).toContain("salted and hashed");
     expect(page).toContain("CREATE ACCOUNT");
     expect(page).toContain("CONTINUE WITH CONNECTED ACCOUNT");
+  });
+
+  it("renders the forgot password link", () => {
+    const page = renderToStaticMarkup(<Account />);
+    expect(page).toContain("FORGOT PASSWORD?");
   });
 });

@@ -13,7 +13,11 @@ export default defineConfig({
     },
   },
   test: {
-    environment: "jsdom",
+    environment: "node",
     include: ["server/**/*.test.ts", "server/**/*.spec.ts", "shared/**/*.test.ts", "shared/**/*.spec.ts", "client/**/*.test.ts", "client/**/*.test.tsx", "client/**/*.spec.ts", "client/**/*.spec.tsx"],
+    env: {
+      JWT_SECRET: "test-secret-key-at-least-32-characters-long",
+      VITE_APP_ID: "test-app-id",
+    }
   },
 });

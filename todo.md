@@ -203,3 +203,11 @@
 - [x] Implement a responsive multi-theme Popover selector in the desktop navigation and a grid selector in the mobile menu.
 - [x] Add automated coverage for theme switching, persistence, and legacy migration in client-side tests.
 - [x] Verify theme-aware legacy color overrides to ensure visual coherence across all palettes.
+
+- [x] Audit the full-stack surface for beta-critical gaps (links, states, errors).
+- [x] Implement a secure password reset flow with token-based recovery (email delivery deferred).
+- [x] Implement an email verification infrastructure for local accounts.
+- [x] Configure Capacitor to wrap the Cosmic Wisdom web app as an Android application.
+- [x] Set up the Android build pipeline and configure live-reload for mobile testing.
+- [x] Verify mobile-specific UX, including safe areas and touch-optimized interactions.
+- [x] Enhance natal readings with personalized date-driven daily teachings.

@@ -42,10 +42,21 @@ queryClient.getMutationCache().subscribe(event => {
   }
 });
 
+const getBaseUrl = () => {
+  if (typeof window !== "undefined" && window.location.origin.includes("localhost")) {
+    return "";
+  }
+  // In a native app (Capacitor), we need the absolute URL
+  if (typeof window !== "undefined" && (window.location.protocol === "capacitor:" || window.location.protocol === "http:")) {
+     return "https://cosmicwisdom.manus.space";
+  }
+  return "";
+};
+
 const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
-      url: "/api/trpc",
+      url: `${getBaseUrl()}/api/trpc`,
       transformer: superjson,
       headers() {
         // Preview auto-login fallback: when the browser blocks iframe cookies

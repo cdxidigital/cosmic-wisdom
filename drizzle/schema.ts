@@ -167,6 +167,34 @@ export const cosmicFiles = mysqlTable(
   table => [index("cosmicFiles_userId_idx").on(table.userId), index("cosmicFiles_profileId_idx").on(table.profileId)],
 );
 
+/** One-time tokens for secure password recovery. */
+export const passwordResetTokens = mysqlTable(
+  "passwordResetTokens",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+    token: varchar("token", { length: 128 }).notNull().unique(),
+    expiresAt: timestamp("expiresAt").notNull(),
+    usedAt: timestamp("usedAt"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  table => [index("passwordResetTokens_userId_idx").on(table.userId)]
+);
+
+/** One-time tokens for member email verification. */
+export const emailVerificationTokens = mysqlTable(
+  "emailVerificationTokens",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+    token: varchar("token", { length: 128 }).notNull().unique(),
+    expiresAt: timestamp("expiresAt").notNull(),
+    usedAt: timestamp("usedAt"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  table => [index("emailVerificationTokens_userId_idx").on(table.userId)]
+);
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type CosmicProfile = typeof cosmicProfiles.$inferSelect;
@@ -175,3 +203,5 @@ export type CosmicFile = typeof cosmicFiles.$inferSelect;
 export type CosmicReading = typeof cosmicReadings.$inferSelect;
 export type CosmicNatalChart = typeof cosmicNatalCharts.$inferSelect;
 export type CosmicSavedItem = typeof cosmicSavedItems.$inferSelect;
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+export type EmailVerificationToken = typeof emailVerificationTokens.$inferSelect;

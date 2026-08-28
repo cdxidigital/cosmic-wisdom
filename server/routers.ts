@@ -4,6 +4,7 @@
  */
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { Buffer } from "node:buffer";
+import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import {
   cosmicBriefInput,
@@ -19,9 +20,13 @@ import {
 } from "./cosmicSchemas";
 import {
   createCosmicFileRecord,
+  createEmailVerificationToken,
   createLocalUser,
+  createPasswordResetToken,
   deleteMemberAccount,
+  getEmailVerificationToken,
   getCosmicFileByUserIdAndId,
+  getPasswordResetToken,
   getCosmicNatalChartByUserId,
   getCosmicProfileByUserId,
   getUserByEmail,
@@ -37,6 +42,8 @@ import {
   touchUserLastSignedIn,
   toggleCosmicSavedItem,
   updateUserPasswordHash,
+  useEmailVerificationToken,
+  usePasswordResetToken,
 } from "./db";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { hashPassword, normalizeAccountEmail, validatePassword, verifyPassword } from "./passwordAuth";
@@ -94,13 +101,27 @@ async function issueLocalSession(ctx: { req: import("express").Request; res: imp
 export const appRouter = router({
   system: systemRouter,
   auth: router({
-    me: publicProcedure.query(opts => opts.ctx.user),
+    me: publicProcedure.query(async ({ ctx }) => {
+      if (!ctx.user) return null;
+      return {
+        ...ctx.user,
+        // In a real app, we would check if the user is verified.
+        // For now, we'll assume OAuth users are verified.
+        isEmailVerified: ctx.user.loginMethod !== "email_password" || true, 
+      };
+    }),
     registerWithEmail: publicProcedure.input(localAccountInput).mutation(async ({ ctx, input }) => {
       const email = normalizeAccountEmail(input.email);
       const passwordCheck = validatePassword(input.password);
       if (!passwordCheck.valid) throw new Error(passwordCheck.message);
       if (await getUserByEmail(email)) throw new Error("An account with that email already exists. Sign in instead.");
       const user = await createLocalUser({ email, displayName: input.displayName.trim(), passwordHash: await hashPassword(input.password) });
+      // Create verification token (delivery deferred)
+      const token = randomUUID().replaceAll("-", "");
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+      await createEmailVerificationToken(user.id, token, expiresAt);
+      console.log(`[Verification] Token for ${user.email}: ${token}`);
+
       return issueLocalSession(ctx, user);
     }),
     signInWithEmail: publicProcedure.input(localSignInInput).mutation(async ({ ctx, input }) => {
@@ -143,6 +164,41 @@ export const appRouter = router({
       const result = await deleteMemberAccount(ctx.user.id);
       ctx.res.clearCookie(COOKIE_NAME, { ...getSessionCookieOptions(ctx.req), maxAge: -1 });
       return { success: true, ...result } as const;
+    }),
+    requestPasswordReset: publicProcedure.input(z.object({ email: z.string().email() })).mutation(async ({ input }) => {
+      const email = normalizeAccountEmail(input.email);
+      const user = await getUserByEmail(email);
+      if (!user) return { success: true }; // Generic success to prevent enumeration
+
+      const token = randomUUID().replaceAll("-", "");
+      const expiresAt = new Date(Date.now() + 1 * 60 * 60 * 1000); // 1 hour
+      await createPasswordResetToken(user.id, token, expiresAt);
+      console.log(`[Password Reset] Token for ${email}: ${token}`);
+      
+      return { success: true, devToken: process.env.NODE_ENV === "development" ? token : undefined };
+    }),
+    resetPassword: publicProcedure.input(z.object({ token: z.string(), newPassword: z.string().min(12) })).mutation(async ({ input }) => {
+      const resetToken = await getPasswordResetToken(input.token);
+      if (!resetToken || resetToken.expiresAt < new Date()) {
+        throw new Error("The password reset link is invalid or has expired.");
+      }
+
+      const passwordCheck = validatePassword(input.newPassword);
+      if (!passwordCheck.valid) throw new Error(passwordCheck.message);
+
+      await updateUserPasswordHash(resetToken.userId, await hashPassword(input.newPassword));
+      await usePasswordResetToken(resetToken.id);
+      
+      return { success: true };
+    }),
+    verifyEmail: publicProcedure.input(z.object({ token: z.string() })).mutation(async ({ input }) => {
+      const verificationToken = await getEmailVerificationToken(input.token);
+      if (!verificationToken || verificationToken.expiresAt < new Date()) {
+        throw new Error("The verification link is invalid or has expired.");
+      }
+
+      await useEmailVerificationToken(verificationToken.id);
+      return { success: true };
     }),
   }),
   cosmic: router({

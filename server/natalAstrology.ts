@@ -165,6 +165,7 @@ export function normaliseNatalResponse(payload: unknown): NatalCalculation {
         ...aspects.slice(0, 3).map(aspect => ({ label: "Key aspect", placement: `${aspect.first} ${aspect.type} ${aspect.second}`, interpretation: `This calculated aspect is an invitation to notice how these parts of your chart cooperate or ask for conscious integration.` })),
       ],
       practicalFocus: `For one week, notice where your ${sun.sign} Sun leads, your ${moon.sign} Moon needs care, and your ${rising.sign} Rising shapes your first move.`,
+      dailyTeaching: generateDailyTeaching(sun, moon, rising, leadingElement),
     },
     sourceData: {
       provider: PROVIDER,
@@ -175,6 +176,18 @@ export function normaliseNatalResponse(payload: unknown): NatalCalculation {
       confidence: source.confidence && typeof source.confidence === "object" ? source.confidence : null,
     },
   };
+}
+
+function generateDailyTeaching(sun: NatalPlacement, moon: NatalPlacement, rising: NatalPlacement, element: string) {
+  const date = new Date();
+  const seed = date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
+  const topics = [
+    { label: "Energy Stewardship", focus: sun.sign, interpretation: `Today, your ${sun.sign} Sun suggests focusing on where you initiate action. Don't just respond; lead from your core.` },
+    { label: "Emotional Restoration", focus: moon.sign, interpretation: `With your ${moon.sign} Moon, today's restoration comes from honoring your inner weather. Seek quiet if the world feels too loud.` },
+    { label: "Social Thresholds", focus: rising.sign, interpretation: `Your ${rising.sign} Rising is your gateway today. Notice how you 'show up' in new rooms or conversations.` },
+    { label: "Elemental Flow", focus: element, interpretation: `Lean into your ${element} emphasis today. Use its qualities to solve a persistent problem or start a new dialogue.` },
+  ];
+  return topics[seed % topics.length];
 }
 
 export async function calculateNatalChart(profile: CosmicProfile): Promise<NatalCalculation> {

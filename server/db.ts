@@ -2,7 +2,7 @@
  * Database helpers for Cosmic keep all queries member-scoped. Private birth data
  * and stored-file references are never queried without the authenticated owner ID.
  */
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, isNull } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
@@ -12,6 +12,8 @@ import {
   cosmicProfiles,
   cosmicReadings,
   cosmicSavedItems,
+  passwordResetTokens,
+  emailVerificationTokens,
   CosmicFile,
   CosmicNatalChart,
   CosmicProfile,
@@ -338,4 +340,36 @@ export async function markCosmicNatalCalculationFailed(userId: number) {
   if (!profile) return;
   const db = await requireDb();
   await db.update(cosmicProfiles).set({ calculationStatus: "failed" }).where(eq(cosmicProfiles.id, profile.id));
+}
+
+export async function createPasswordResetToken(userId: number, token: string, expiresAt: Date) {
+  const db = await requireDb();
+  await db.insert(passwordResetTokens).values({ userId, token, expiresAt });
+}
+
+export async function getPasswordResetToken(token: string) {
+  const db = await requireDb();
+  const result = await db.select().from(passwordResetTokens).where(and(eq(passwordResetTokens.token, token), isNull(passwordResetTokens.usedAt))).limit(1);
+  return result[0] ?? null;
+}
+
+export async function usePasswordResetToken(tokenId: number) {
+  const db = await requireDb();
+  await db.update(passwordResetTokens).set({ usedAt: new Date() }).where(eq(passwordResetTokens.id, tokenId));
+}
+
+export async function createEmailVerificationToken(userId: number, token: string, expiresAt: Date) {
+  const db = await requireDb();
+  await db.insert(emailVerificationTokens).values({ userId, token, expiresAt });
+}
+
+export async function getEmailVerificationToken(token: string) {
+  const db = await requireDb();
+  const result = await db.select().from(emailVerificationTokens).where(and(eq(emailVerificationTokens.token, token), isNull(emailVerificationTokens.usedAt))).limit(1);
+  return result[0] ?? null;
+}
+
+export async function useEmailVerificationToken(tokenId: number) {
+  const db = await requireDb();
+  await db.update(emailVerificationTokens).set({ usedAt: new Date() }).where(eq(emailVerificationTokens.id, tokenId));
 }
