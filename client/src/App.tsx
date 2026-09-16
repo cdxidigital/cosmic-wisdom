@@ -5,7 +5,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch, useLocation } from "wouter";
+import { Route, Switch } from "wouter";
 import { lazy, Suspense, type ComponentType } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -65,11 +65,6 @@ function Router() {
   );
 }
 
-function ChartDetailsShortcut() {
-  const [location] = useLocation();
-  if (location !== "/") return null;
-  return <div className="fixed bottom-4 left-4 z-30 flex flex-wrap gap-2"><a href="/natal-details" className="border border-[#102936]/15 bg-[#F3F0E9]/95 px-3 py-2 font-mono text-[8px] tracking-[.13em] text-[#55707d] shadow-sm transition-colors hover:border-[#B63C5E] hover:text-[#B63C5E]">CHART DETAILS ↗</a><a href="/daily-ritual" className="border border-[#102936]/15 bg-[#F3F0E9]/95 px-3 py-2 font-mono text-[8px] tracking-[.13em] text-[#55707d] shadow-sm transition-colors hover:border-[#B63C5E] hover:text-[#B63C5E]">DAILY RITUAL ↗</a><a href="/account/settings" className="border border-[#102936]/15 bg-[#F3F0E9]/95 px-3 py-2 font-mono text-[8px] tracking-[.13em] text-[#55707d] shadow-sm transition-colors hover:border-[#B63C5E] hover:text-[#B63C5E]">ACCOUNT SETTINGS ↗</a></div>;
-}
 
 function App() {
   return (
@@ -78,7 +73,6 @@ function App() {
         <TooltipProvider>
           <Toaster theme="light" richColors position="bottom-right" />
           <Router />
-          <ChartDetailsShortcut />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
